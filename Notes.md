@@ -50,3 +50,67 @@ switch (month) {
         break;
 }
 ```
+
+
+## **Minutes to Years and Days Function**
+``` java
+public static void printYearsAndDays (long minutes){
+        if (minutes < 0) {
+            System.out.println("Invalid Value");
+
+        } else {
+
+            long minInOneYear = (365 * 24 * 60);
+            long minInOneDay = (24 * 60);
+            long years = minutes / minInOneYear;
+            long days = minutes / minInOneDay;
+            long remaingDays = days % 365;
+
+            System.out.println(minutes + " min = " + years + " y and " + remaingDays + " d");
+        }
+    }
+```
+
+## **Leap Year Function**
+``` java
+public static boolean isLeapYear(int year) {
+
+        if (year < 1 || year > 9999) {
+            return false;
+        }
+
+        if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
+            return true;
+        } else {
+            return false;
+        }
+
+}
+```
+
+
+## **Prime Numbers Function**
+``` java
+public static boolean isPrime(int n){
+        if (n == 1){
+            return false;
+        }
+
+        // Optimise version 1
+        for (int i=2; i <= (long) Math.sqrt(n); i++) {
+            System.out.println("Looping " + i);
+            if (n % i == 0) {
+                return false;
+            }
+        }
+
+        // Optimise version 2
+        //for (int i=2; i <= n/2; i++) {
+        //    if (n % i == 0) {
+        //        return false;
+        //    }
+        //}
+
+        return true;
+}
+```
