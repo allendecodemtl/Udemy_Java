@@ -114,3 +114,105 @@ public static boolean isPrime(int n){
         return true;
 }
 ```
+
+## ** Sum digits function**
+``` java
+public static int sumDigits (int number){
+
+        if (number < 10) {
+            return -1;
+        }
+
+        int sum = 0;
+
+        while(number > 0){
+            // extract least significant digit
+            int digit = number % 10;
+            sum += digit;
+
+            // drop least significant digit
+            number /= 10;
+
+        }
+
+        return sum;
+
+}
+```
+
+## ** Palindrome function**
+``` java
+public static boolean isPalindrome(int number){
+
+        int processed = number;
+        int reversed = 0;
+
+
+        while (processed != 0){
+
+            // get least significant number
+            int lastDigit = processed % 10;
+            reversed = (reversed * 10) + lastDigit;
+
+            processed /= 10;
+
+        }
+
+        if (number == reversed){
+            return true;
+        } else {
+            return false;
+        }
+
+}
+```
+
+## ** Sum first and last digit function**
+``` java
+public static int sumFirstAndLastDigit (int number){
+        if (number < 0){
+            return -1;
+        }
+
+        int last = number % 10;
+
+        int first = number;
+        while (first >= 10) {
+            first /= 10;
+        }
+
+        return first + last;
+
+}
+```
+
+
+
+## ** Break vs Continue in loop**
+> Break will exit the loop depending on the condition that we are checking
+> Continue will bypass the part of code block that is below the continue keyword and continue with the next iteration
+``` java
+int number = 4;
+int finishedNumber = 20;
+int sumEven = 0;
+int countEven = 0;
+
+while (number <= finishedNumber){
+
+   number++;
+
+   if (!isEvenNumber(number)) continue;
+
+    System.out.println("Even num: " + number);
+
+    sumEven += number;
+    countEven++;
+
+    if (countEven >= 5){
+        break;
+    }
+
+}
+
+System.out.println("Sum even num: " + sumEven);
+```
