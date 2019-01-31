@@ -1,6 +1,6 @@
 package Exercise;
 
-public class E08EvenDigitSum {
+public class E09EvenDigitSum {
     public static void main(String[] args) {
         int res;
         res = getEvenDigitSum(123456789);
