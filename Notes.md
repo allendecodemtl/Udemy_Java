@@ -115,7 +115,7 @@ public static boolean isPrime(int n){
 }
 ```
 
-## ** Sum digits function**
+## **Sum digits function**
 ``` java
 public static int sumDigits (int number){
 
@@ -140,7 +140,7 @@ public static int sumDigits (int number){
 }
 ```
 
-## ** Palindrome function**
+## **Palindrome function**
 ``` java
 public static boolean isPalindrome(int number){
 
@@ -167,7 +167,7 @@ public static boolean isPalindrome(int number){
 }
 ```
 
-## ** Sum first and last digit function**
+## **Sum first and last digit function**
 ``` java
 public static int sumFirstAndLastDigit (int number){
         if (number < 0){
@@ -188,7 +188,7 @@ public static int sumFirstAndLastDigit (int number){
 
 
 
-## ** Break vs Continue in loop**
+## **Break vs Continue in loop**
 > Break will exit the loop depending on the condition that we are checking
 > Continue will bypass the part of code block that is below the continue keyword and continue with the next iteration
 ``` java
