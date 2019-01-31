@@ -1,5 +1,43 @@
 ## **Method Overloading**
-> Overloading only applies to parameters
+>- **Overloading** does not have anything to do with **polymorphism** but java developers oftern refer to overloading as Compile Time Polymorphism
+>- In other words the compiler decided which methods is going to be called based on the method name, return type and arguement list.
+>- We **can overlaod static** and **instance** methods
+>- Usually **Overloading** happends inside a single class, but a method can also be treated as **overloade** usn the subclass of that class
+>- That is because a **subclass inherits** one version of the method from the parent class and then the subclass can have another overloaded version of the method
+>- Methods will be considered overloaded if both follow the following rules:
+>   * Methods must have the same method name
+>   * Methods must have different parameters
+>- If methods follow the above rules, then they may or may not
+>   * Have different return types
+>   * Have different access modifiers
+>   * Throw different checked and unchecked exception
+
+## **Method Overriding**
+>- Method **overriding** means defining a method in a child class that already exists in the parent class with same signature (method name and parameters)
+>- Method **overriding** aka as **Runtime Polymorphysim** and **Dynamic Method Dispatch**, becasue the method that is going to be called is decided at runtime by the JVM
+>- Methods will be considered **overridden** if we follow these rules:
+>   * It must have same name and same arguments
+>   * Return type can be a subclass of the return type in the parent class
+>   * It can't have a lower access modifier
+>   * Example - parent method is protected, then using private in the child is not allowed but using public in the child would be allowed
+``` java
+class Animal {
+    protected void walk(){};
+}
+class Fist {
+    @override
+    ~~private~~ public void walk(){}; // -> private won't be allowed but public
+}
+```
+>- Important points 
+>   * Only inherited methods can be overriden
+>   * Constructors and private methods cannot be overriden
+>   * Methods that are final cannot be overriden
+>   * A subclass can user super.methodName() to call the superclass version of an overriden method
+
+
+
+
 ``` java
 public static int sum(int a, int b) {
   retrun a + b;
