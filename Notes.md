@@ -35,8 +35,7 @@ class Fist {
 >   * Methods that are final cannot be overriden
 >   * A subclass can user super.methodName() to call the superclass version of an overriden method
 
-
-
+![Recap](images/img_0001.png)
 
 ``` java
 public static int sum(int a, int b) {
