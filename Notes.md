@@ -1,3 +1,93 @@
+## **Static Methods**
+>- **Static methods** are declared using a static modifier
+>- **Static methods can't** access instance methods and instance variables directly
+>- They are usually used for operations that don't require any data from an instance of the class (from 'this')
+>- **Static methods can't** use the **this** keyword
+>- Whenever you see method that does not use instance variables that method should be declared as a static method
+>- Example - main is a static method and it is called by the JVM when it starts an app
+
+## **Instance Methods**
+>- **Instance methods** below to an instance of a class
+>- To use an **instance method** we have to instantiate the class first usually by using the new keyword
+>- **Instance methods** can access instance methods and variance variables directly
+>- **Instance methods** can also access static methods and static var directly
+
+``` java 
+cclass Calculator{
+    public static void printSum(int a, int b){
+        System.out.println("sum= " + (a + b));
+    }
+    public void printMultiply(int a, int b){
+        System.out.println("multiply= " + (a * b));
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Static methods
+        Calculator.printSum(5 ,10); // -> called as ClasName.methodName();
+        printHello();               // -> called as methodName(); only if in the same class
+
+        // Instance method
+        Calculator cal = new Calculator(); // -> create instance
+        cal.printMultiply(3,5);            // -> call instance methods
+    }
+
+    public static void printHello() {
+        System.out.println("Hello");
+    }
+}
+```
+___
+## **Static Variables**
+>- Declared by using the keyword static
+>- Static var aka static member var
+>- Every instance of that class shares the same instance var
+>- If changes are made all instance will see the effect of change
+>- Not used very often but can sometimes be very useful
+``` java
+class Dog{
+    private static String name;
+    public Dog(String name) { Dog.name = name; }  // Set static var
+    public void printName() { System.out.println("name = " + name); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog rex = new Dog("rex");
+        Dog fluffy = new Dog("fluffy");
+        rex.printName();       // -> prints "fluffy"
+        fluffy.printName();    // -> prints "fluffy"
+    }
+}
+```
+
+## **Instance Variables**
+>- Don't use the keyword static
+>- aka files or member fields
+>- Instance vars belong to an instance of a class
+>- Every instance has it's own copy of an instance var
+>- Every instance can have a different value (state)
+>- Instance vars represent the state of an instance
+``` java
+class Dog{
+    private static String name;
+    public Dog(String name) { this.name = name; } // Instanciate instance var
+    public void printName() { System.out.println("name = " + name); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog rex = new Dog("rex");
+        Dog fluffy = new Dog("fluffy");
+        rex.printName();       // -> prints "rex"
+        fluffy.printName();    // -> prints "fluffy"
+    }
+}
+```
+
+___
 ## **Method Overloading**
 >- **Overloading** does not have anything to do with **polymorphism** but java developers oftern refer to overloading as Compile Time Polymorphism
 >- In other words the compiler decided which methods is going to be called based on the method name, return type and arguement list.
