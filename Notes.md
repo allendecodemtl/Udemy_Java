@@ -722,7 +722,7 @@ private static void processArrayList() {
 ```
 
 ## **Autoboxing vs unboxing**
-//TODO -> not required since Java5
+//TODO -> not required since Java5 -> JVM automatically do it
 > ArrayList
 ``` java
 ArrayList<String> stringArrayList = new ArrayList<>();
