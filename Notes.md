@@ -454,9 +454,9 @@ public static int sumFirstAndLastDigit (int number){
 
 
 ## **Break vs Continue vs Return**
->-  * The break statement results in the termination of the loop, it will come out of the loop and stops further iterations. 
->-  * The continue statement stops the current execution of the iteration and proceeds to the next iteration. 
->-  * The return statement takes you out of the method.
+>-  The break statement results in the termination of the loop, it will come out of the loop and stops further iterations. 
+>-  The continue statement stops the current execution of the iteration and proceeds to the next iteration. 
+>-  The return statement takes you out of the method.
 
 > Break will exit the loop depending on the condition that we are checking
 > Continue will bypass the part of code block that is below the continue keyword and continue with the next iteration
@@ -706,8 +706,7 @@ private static void modifyArray(int[] array){
 ```
 
 ## **List and Arraylist**
-> ArrayList inherits from list
-> 
+
 
 ## **Copying Arraylist**
 ``` java
@@ -720,4 +719,59 @@ private static void processArrayList() {
     String[] myArray = new String[groceryList.getGroceryList().size()];
     myArray = groceryList.getGroceryList().toArray(myArray);
 }
+```
+
+## **Autoboxing vs unboxing**
+//TODO -> not required since Java5
+> ArrayList
+``` java
+ArrayList<String> stringArrayList = new ArrayList<>();
+stringArrayList.add("Tim");
+```
+> ArrayList cannot be of primitive type
+``` java
+// Bellow not allowed
+// ArrayList<int> intArrayList = new ArrayList<int>();
+```
+> One workaround is to create a class to store int
+``` java
+class IntClass{
+    private int myValue;
+
+    public IntClass(int myValue) {
+        this.myValue = myValue;
+    }
+
+    public int getMyValue() {
+        return myValue;
+    }
+
+    public void setMyValue(int myValue) {
+        this.myValue = myValue;
+    }
+}
+
+psvm = (String[] args){
+    ArrayList<IntClass> intClassArrayList = new ArrayList<IntClass>();
+    intClassArrayList.add(new IntClass(54));
+}
+```
+> **Long verison -** Better workaround is to use autoboxing and unboxing in java
+``` java
+Integer integer = new Integer(54);
+Double doubleValue = new Double(43d);
+
+ArrayList<Integer> intArrayList = new ArrayList<Integer>();
+for(int i=0; i<=10; i++){
+    intArrayList.add(Integer.valueOf(i));  // This is autoboxing -> converting primitives to Integer obj/wrapper
+}
+
+for(int i=0; i<intArrayList.size(); i++){
+    System.out.println(i + " -> " + intArrayList.get(i).intValue());  // This is unboing -> coverting Integer obj/wrapper to primitives
+}
+```
+> **Short verison -** Better workaround is to use autoboxing and unboxing in java
+``` java
+Integer myIntValue = 56;  // JVM will do - Integer.valueOf(56);
+int myInt = myIntValue;   // JVM will do - myInt.intValue();
 ```

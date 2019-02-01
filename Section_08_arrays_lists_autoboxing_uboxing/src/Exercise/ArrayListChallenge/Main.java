@@ -1,5 +1,6 @@
 package Exercise.ArrayListChallenge;
 
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -46,7 +47,7 @@ public class Main {
         }
     }
 
-    private static void addNewContact(){
+    private static void addNewContact() {
         System.out.println("Enter new contact name: ");
         String name = sc.nextLine();
         System.out.println("Enter new phone number: ");
@@ -60,16 +61,59 @@ public class Main {
         }
     }
 
-    private static void updateContact(){
+    private static void updateContact() {
         System.out.println("Enter existing contact name: ");
         String name = sc.nextLine();
 
         Contact existingContactRecord = mobilePhone.queryContact(name);
-        if (existingContactRecord == null){
+        if (existingContactRecord == null) {
             System.out.println("Contact not found.");
+            return;
+        }
 
+        System.out.println("Enter new contact name: ");
+        String newName = sc.nextLine();
+        System.out.println("Enter new phone number: ");
+        String newPhone = sc.nextLine();
+        Contact newContact = Contact.createContact(newName, newPhone);
+
+        if (mobilePhone.updateContact(existingContactRecord, newContact)) {
+            System.out.println("Successfully updated record");
+        } else {
+            System.out.println("Error updating record");
         }
     }
+
+    private static void removeContact() {
+        System.out.println("Enter existing contact name: ");
+        String name = sc.nextLine();
+
+        Contact existingContactRecord = mobilePhone.queryContact(name);
+        if (existingContactRecord == null) {
+            System.out.println("Contact not found.");
+            return;
+        }
+
+        if (mobilePhone.removeContact(existingContactRecord)) {
+            System.out.println("Successfully deleted");
+        } else {
+            System.out.println("Error deleting contact");
+        }
+    }
+
+    private static void queryContact() {
+        System.out.println("Enter existing contact name: ");
+        String name = sc.nextLine();
+
+        Contact existingContactRecord = mobilePhone.queryContact(name);
+        if (existingContactRecord == null) {
+            System.out.println("Contact not found.");
+            return;
+        }
+
+        System.out.println("Name: " + existingContactRecord.getPhoneNumber() + " phone number is " + existingContactRecord.getPhoneNumber());
+    }
+
 
     private static void startPhone() {
         System.out.println("Starting phone...");
