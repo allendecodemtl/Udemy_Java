@@ -379,6 +379,37 @@ public static boolean isPalindrome(int number){
 }
 ```
 
+## **Sorting & copying arrays using basic loop function**
+``` java
+public static int[] sortIntegers(int[] array){
+    int[] sortedArray = new int[array.length];
+    // Copyng an array to another array
+    for(int i=0; i<array.length; i++){
+        sortedArray[i] = array[i];
+    }
+    // Alternative would be to use copyOf
+    // int[] sortedArray = Arrays.copyOf(array, array.length);
+
+    // Sorting algorithm using basic loop 
+    boolean flag = true;
+    int temp;
+
+    while(flag){
+        flag = false;
+        for(int i=0; i<sortedArray.length-1; i++){
+            if (sortedArray[i] < sortedArray[i+1]){
+                temp = sortedArray[i];
+                sortedArray[i] = sortedArray[i+1];
+                sortedArray[i+2] = temp;
+                flag = true;
+            }
+        }
+
+    }
+    return sortedArray;
+}
+```
+
 ## **Sum first and last digit function**
 ``` java
 public static int sumFirstAndLastDigit (int number){
@@ -610,8 +641,17 @@ System.out.println(anotherHouse.getColor()); // -> green
 
 ```
 
-## **Classes**
-> 
+## **Arrays**
+> Needs to be the same type
+> Method 1 - Declaring arrays and accessing elements
 ``` java
+int[] myIntVariable = new int[10];
+myIntVariable[0] = 50;                  // -> Starting index = 0
+System.out.println(myIntVariable[0]);   // -> Print 50
+```
+> Method 2 - Declaring arrays
+``` java
+int[] myIntVariable = {1,2,3,4,5,6};     // Declare and initialise
+System.out.println(myIntVariable[5]);    // Print 6
 ```
 
