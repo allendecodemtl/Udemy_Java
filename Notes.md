@@ -86,8 +86,8 @@ public class Main {
     }
 }
 ```
-
 ___
+
 ## **Method Overloading**
 >- **Overloading** does not have anything to do with **polymorphism** but java developers oftern refer to overloading as Compile Time Polymorphism
 >- In other words the compiler decided which methods is going to be called based on the method name, return type and arguement list.
@@ -153,6 +153,66 @@ private static void calculateScore() {
     System.out.println("No player name, no player score");
 }
 ```
+___
+## **Is a vs Has**
+> Inheritance (IS A)
+``` java
+public class Car extends Vehicle { // -> Car "IS A" vehicle
+    ....    
+}
+```
+> Composition (HAS A)
+>   * Object within objects
+``` java
+public class Main{
+    public static void main(String[] args) {
+        Case myCase = new Case(... Initiliase with correct args);
+        Resolution myResolution = new Resolution(... Initiliase with correct args);
+        Monitor myMonitor = new Monitor(...., myResolution ,.....)
+        
+        PC myPC = new PC(myCase, myMonitor); // Initialising with appropriate object
+        myPC.getMonitor().draw(100,200,"red"); // Accessing methods of monitor object
+        myPC.getTheCase().pressProwerButton(); // Accessing methods of case object
+    }
+}
+
+public class PC {
+    private Case theCase;       // Composition -> PC "HAS A" Case
+    private Monitor theMonitor; // Composition -> PC "HAS A" Monitor
+
+    // Constructor
+    // Getter and Setters
+}
+
+public class Case {
+    // Class vars
+    // Constructor
+    public void pressProwerButton() {
+        System.out.println("Power button pressed");
+    }
+    // Getters and setters
+}
+
+public class Monitor {
+    // Decalre other class var
+    private int size; // Example Class variables 
+    private Resolution nativeResolution;  // This is composition => Monitor "HAS A" resolution
+
+    // Constructor
+    public static draw(int x, int y, String color) {
+        System.out.println("Drawing prixel at " + x + "," + y + " in color " + color);
+    }
+    // Getters and setters
+}
+
+public class Resolution {... usual stuffs ...}
+```
+___
+
+## **Encapsulation**
+> 
+
+___
 
 ## **CONSTANT Value**
 > By convention final variable is in all caps
