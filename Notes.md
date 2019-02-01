@@ -379,6 +379,29 @@ public static boolean isPalindrome(int number){
 }
 ```
 
+## **Reverse array logic function**
+``` java 
+public static int[] reverseMine(int[] array){
+    int[] reverseArray = new int[array.length];
+    for(int i = 0; i< array.length; i++){
+        reverseArray[i] = array[array.length-1-i];
+    }
+    return reverseArray;
+}
+
+private static void reverse(int[] array){
+    int maxIndex = array.length-1;
+    int halfLength = array.length/2;
+
+    for (int i=0; i<halfLength; i++){
+        int temp = array[i];
+        array[i] = array[maxIndex - i];
+        array[maxIndex-i] = temp;
+    }
+    }
+```
+
+
 ## **Sorting & copying arrays using basic loop function**
 ``` java
 public static int[] sortIntegers(int[] array){
@@ -430,7 +453,11 @@ public static int sumFirstAndLastDigit (int number){
 ```
 
 
-## **Break vs Continue in loop**
+## **Break vs Continue vs Return**
+>-  * The break statement results in the termination of the loop, it will come out of the loop and stops further iterations. 
+>-  * The continue statement stops the current execution of the iteration and proceeds to the next iteration. 
+>-  * The return statement takes you out of the method.
+
 > Break will exit the loop depending on the condition that we are checking
 > Continue will bypass the part of code block that is below the continue keyword and continue with the next iteration
 ``` java
@@ -655,3 +682,42 @@ int[] myIntVariable = {1,2,3,4,5,6};     // Declare and initialise
 System.out.println(myIntVariable[5]);    // Print 6
 ```
 
+## **Refrence Types vs Value Types**
+> (Array and Object) vs Primitives
+> Array are reference types (hold an address not the object itself)
+> Also applies when passed as method parameter
+``` java
+....{
+int[] myIntArray = new int[5];  // -> Here myIntArray hold a reference to the object int[5] which is stored somewhere else in mem
+int[] anotherArray = myIntArray; // -> Here anotherArray hold the referenc to the object int[5]
+System.out.println("myIntArray = " + Arrays.toString(myIntArray)); // -> [0, 0, 0, 0, 0]
+System.out.println("anotherArray = " + Arrays.toString(anotherArray)); // -> [0, 0, 0, 0, 0]
+anotherArray[0] = 1;
+System.out.println("after change myIntArray = " + Arrays.toString(myIntArray)); // -> [1, 0, 0, 0, 0]
+System.out.println("after change anotherArray = " + Arrays.toString(anotherArray)); // -> [1, 0, 0, 0, 0]
+modifyArray(myIntArray);
+System.out.println("after modify myIntArray = " + Arrays.toString(myIntArray));    // -> [2, 0, 0, 0, 0] 
+System.out.println("after modify anotherArray = " + Arrays.toString(anotherArray)); // -> [2, 0, 0, 0, 0]
+}...
+private static void modifyArray(int[] array){
+    array[0] = 2;
+    array = new int[] {1,2,3,4,5}; // dereferincing
+}
+```
+
+## **List and Arraylist**
+> ArrayList inherits from list
+> 
+
+## **Copying Arraylist**
+``` java
+private static void processArrayList() {
+    ArrayList<String> newArray = new ArrayList<String>();
+    newArray.addAll(groceryList.getGroceryList());
+
+    ArrayList<String> nextArray = new ArrayList<String>(groceryList.getGroceryList());
+
+    String[] myArray = new String[groceryList.getGroceryList().size()];
+    myArray = groceryList.getGroceryList().toArray(myArray);
+}
+```

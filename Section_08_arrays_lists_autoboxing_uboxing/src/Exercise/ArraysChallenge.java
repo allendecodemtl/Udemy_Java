@@ -1,4 +1,4 @@
-package L_01;
+package Exercise;
 
 import java.util.Arrays;
 import java.util.Scanner;
