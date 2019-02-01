@@ -214,6 +214,31 @@ ___
 
 ___
 
+## **Polymorphism**
+> If inherits from a class, JVM will determine which method to use.. Usually the local method but if not available, it will go to the parent.
+``` java
+public class Movie { .. plot = (): void -> print "No Plot" ..}
+public class Jaws extends Movie{} { .. plot = (): void -> print "Jaws" ..}
+public class MazeRunner extends Movie{} { .. plot = (): void -> print "MazeRunner" ..}
+public class StarWars extends Movie{} { .. plot = (): void -> print "StarWars" ..}
+public class Forgetable extends Movie{} { .. No plot method present ..}
+public class Main { 
+    psvm = (String[] agrs) -> {
+        Movie movie = randomMovie();
+        sout(movie.plot()); 
+        -> if Forgetable obj was returned -> sout will print "No Plot"
+        -> else other obj was returned -> sout will print corresponding class method output
+    }
+    randomMovie = () -> { 
+        Depending on random number generate and 
+        return (new Jaws() || new MazeRunner() || new StarWars() || new Forgetable())
+    }
+}
+
+```
+
+___
+
 ## **CONSTANT Value**
 > By convention final variable is in all caps
 ``` java
