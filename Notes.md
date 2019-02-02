@@ -801,7 +801,7 @@ interface ITelephone {...}
 class DeskPhone implements ITelephone {...}
 class MobilePhone implements ITelephone {..}
 psvm = () => {
-    ITelephone timsPhone;
+    ITelephone timsPhone;  // Generics - Good practice to declare interface and the initializing on the right
 
     timsPhone = new DeskPhone(123456);
     timsPhone.powerOn();
@@ -812,5 +812,37 @@ psvm = () => {
     timsPhone.powerOn();
     timsPhone.callPhone(99999);
     timsPhone.answer();
+}
+```
+``` java
+interface ITelephone {
+    List<String> returnContacts();
+    void printContracts(List<String> listContacts);  // -> do not have {} - which means implementation
+}
+class DeskPhone implements ITelephone {
+    public List<String> returnContacts(){
+        List<String> values = new LinkedList<>();   // -> Specify implementation of List
+        values.add(0, this.name);
+        return values;
+    }
+    public void printContracts() {....};
+}
+class MobilePhone implements ITelephone {
+    public List<String> returnContacts(){
+        List<String> values = new ArrayList<>();   // -> Specify implementation of List
+        values.add(0, this.name);
+        return values;
+    }
+    public void printContracts() {....};
+}
+public class Main {
+    psvm = () => {
+        DeskPhone timsPhone = new DeskPhone(123456);
+        MobilePhone tedsPhone = new MobilePhone(99999);  
+    }
+
+    public static void loadObject (ITelephone objectLoad){  // -> Generic parameter for object
+        objectLoad.read();
+    }
 }
 ```
