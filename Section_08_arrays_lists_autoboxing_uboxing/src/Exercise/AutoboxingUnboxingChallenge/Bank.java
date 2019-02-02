@@ -15,7 +15,7 @@ public class Bank {
     }
 
     public boolean addBranch(String name) {
-        if (findBranch(name) < 0) {
+        if (findBranch(name) == null) {
             Branch newBranch = Branch.addBranch(name);
             this.listBranch.add(newBranch);
             return true;
@@ -64,7 +64,7 @@ public class Bank {
                     ArrayList<Double> transactions = branchCustomer.getListTransactions();
 
                     for (int j=0; j<transactions.size();j++){
-                        System.out.println("[" + (j+1) + "] Amount " + transactions.get(i));
+                        System.out.println("[" + (j+1) + "] Amount " + transactions.get(j));
                     }
                 }
             }

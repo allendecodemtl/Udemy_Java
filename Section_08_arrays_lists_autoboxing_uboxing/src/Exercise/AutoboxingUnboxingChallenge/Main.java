@@ -7,57 +7,22 @@ public class Main {
 
     public static void main(String[] args) {
 
-        boolean quit = false;
-        int choice = 0;
+        Bank bank = new Bank("My Bank");
 
-        printInstructions();
+        bank.addBranch("Adelaide");
+        bank.addCustomer("Adelaide", "Tim", 50.90);
+        bank.addCustomer("Adelaide", "Mike", 213.54);
+        bank.addCustomer("Adelaide", "Percy", 220.12);
 
-        while (!quit){
-            System.out.println("Enter number to proceed: ");
-            choice = sc.nextInt();
-            sc.nextLine();
+        bank.addBranch("Sydney");
+        bank.addCustomer("Sydney", "Bob", 150.34);
 
-            switch (choice){
-                case 0:
-                    printInstructions();
-                    break;
-                case 1:
-                    bank.printListBranch();
-                    break;
-                case 2:
-                    addNewBranch();
-                    break;
-                case 6:
-                    printListOfCustomer();
-                    break;
-                case 7:
-                    addNewCustomer();
-                    break;
-                case 99:
-                    quit = true;
-                    break;
-            }
-        }
-    }
+        bank.addCustomerTransaction("Adelaide", "Tim", 44.32);
+        bank.addCustomerTransaction("Adelaide", "Tim", 412.42);
+        bank.addCustomerTransaction("Adelaide", "Mike", 1.54);
 
-    private static void printInstructions(){
-        System.out.println("\nPress ");
-        System.out.println("\t0 - To print choice option");
-        System.out.println("\t1 - To print the list of branches");
-        System.out.println("\t2 - To add new branch");
-        System.out.println("\t3 - To modify branch");
-        System.out.println("\t4 - To remove branch");
-        System.out.println("\t5 - To search branch");
-        System.out.println("\t6 - To print the list of customers");
-        System.out.println("\t7 - To add new customer");
-        System.out.println("\t8 - To modify customer");
-        System.out.println("\t9 - To remove customer");
-        System.out.println("\t10 - To search customer");
-        System.out.println("\t6 - To print the list of transactions");
-        System.out.println("\t7 - To add new transactions");
-        System.out.println("\t8 - To modify transactions");
-        System.out.println("\t9 - To remove transactions");
-        System.out.println("\t10 - To search transactions");
-        System.out.println("\t99 - To quit ");
+        bank.listCustomer("Adelaide", true);
+        bank.listCustomer("Sydney", true);
+
     }
 }

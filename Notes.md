@@ -775,3 +775,14 @@ for(int i=0; i<intArrayList.size(); i++){
 Integer myIntValue = 56;  // JVM will do - Integer.valueOf(56);
 int myInt = myIntValue;   // JVM will do - myInt.intValue();
 ```
+
+
+## **List <<inteface>>**
+> ArrayList class implements List interface and it is based on an Array data structure
+
+> LinkedList is a doubly-linked list implementation of the List and Deque interfaces
+```
+An iterator for lists that allows the programmer to traverse the list in either direction, modify the list during iteration, and obtain the iterator's current position in the list. A ListIterator has no current element; its cursor position always lies between the element that would be returned by a call to previous() and the element that would be returned by a call to next(). An iterator for a list of length n has n+1 possible cursor positions, as illustrated by the carets (^) below:
+                      Element(0)   Element(1)   Element(2)   ... Element(n-1)
+ cursor positions:  ^            ^            ^            ^                  ^
+```
