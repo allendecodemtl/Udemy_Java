@@ -792,4 +792,25 @@ An iterator for lists that allows the programmer to traverse the list in either 
 
 
 ## **Inner and Abstract Classess & Inteface**
+> Interface is abstract
+> Contract - standardise
+> Method signature does note require 'public/private/protected ..'
+> Implementor need to implement/override all methods in interface 
+``` java
+interface ITelephone {...}
+class DeskPhone implements ITelephone {...}
+class MobilePhone implements ITelephone {..}
+psvm = () => {
+    ITelephone timsPhone;
 
+    timsPhone = new DeskPhone(123456);
+    timsPhone.powerOn();
+    timsPhone.callPhone(123456);
+    timsPhone.answer();
+
+    timsPhone = new MobilePhone(99999);  // Possible because of 'ITelephone timsPhone;'; would be possible if it was declared 'DeskPhone timsPhone;'
+    timsPhone.powerOn();
+    timsPhone.callPhone(99999);
+    timsPhone.answer();
+}
+```
