@@ -786,3 +786,10 @@ An iterator for lists that allows the programmer to traverse the list in either 
                       Element(0)   Element(1)   Element(2)   ... Element(n-1)
  cursor positions:  ^            ^            ^            ^                  ^
 ```
+>- A doubly-linked chain: elements are stored in nodes, with linking back and forth between themselves,
+>- Mutable: objects can be added and/or removed,
+>- Not Thread-safe: LinkedList is not suitable for concurrent access.
+
+
+## **Inner and Abstract Classess & Inteface**
+
