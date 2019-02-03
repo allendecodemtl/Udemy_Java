@@ -791,7 +791,7 @@ An iterator for lists that allows the programmer to traverse the list in either 
 >- Not Thread-safe: LinkedList is not suitable for concurrent access.
 
 
-## **Inner and Abstract Classess & Inteface**
+## **Inteface**
 > Interface is a pure abstract class
 ``` java
 // What we declare
@@ -801,7 +801,7 @@ public interface Moveable{
 }
 
 // What the compiler sees
-public interface Moveable{
+public interface Moveable{ // TODO -> think is changes it to an abstract class
     public static final int AVG_SPEED = 40; // -> automatically adds public static final
     public abstract void move();  // automatically adds public abstract
 }
@@ -810,7 +810,7 @@ public interface Moveable{
 > All variables declared inside interface are implicitly public static final variables(constants)
 > All methods declared inside Java Interfaces are implicitly public and abstract, even if you don't use public or abstract keyword
 > Interface can extend one or more other interface
-> Interface cannot implement a class
+> Interface cannot implement a class (including interfaces which are abstract classesby nature)
 > Interface can be nested inside another interface
 > Method signature does note require 'public/private/protected ..'
 > Implementor need to implement/override all methods in interface 
@@ -874,6 +874,410 @@ public class Main {
 
     public static void loadObject (ITelephone objectLoad){  // -> Generic parameter for object
         objectLoad.printContracts();
+    }
+}
+```
+
+
+
+## **Inner Class**
+> Nested classes are divided into two categories: static and non-static.
+>- Nested classes that are declared static are called **static nested classes**. 
+>- Non-static nested classes are called **inner classes**.
+
+``` java
+public class ShadowTest {
+
+    public int x = 0;
+
+    class FirstLevel {
+
+        public int x = 1;
+
+        void methodInFirstLevel(int x) {
+            System.out.println("x = " + x);
+            System.out.println("this.x = " + this.x);
+            System.out.println("ShadowTest.this.x = " + ShadowTest.this.x);
+        }
+    }
+
+    public static void main(String... args) {
+        ShadowTest st = new ShadowTest();
+        ShadowTest.FirstLevel fl = st.new FirstLevel();
+        fl.methodInFirstLevel(23);
+    }
+}
+```
+```
+x = 23
+this.x = 1
+ShadowTest.this.x = 0
+```
+
+## **Inner Classes - (1) Local vs (2) Anonymous**
+> There are two additional types of inner classes. 
+>- You can declare an inner class within the body of a method. These classes are known as local classes. 
+>- You can also declare an inner class within the body of a method without naming the class. These classes are known as anonymous classes.
+
+> **Local Classes**
+> Local classes are classes that are defined in a block, which is a group of zero or more statements between balanced braces. You typically find local classes defined in the body of a method.
+``` java
+public class LocalClassExample {
+
+    static String regularExpression = "[^0-9]";
+
+    public static void validatePhoneNumber(String phoneNumber1, String phoneNumber2) {
+
+        final int numberLength = 10;
+
+        // Valid in JDK 8 and later:
+        // int numberLength = 10;
+
+        class PhoneNumber {
+        
+            String formattedPhoneNumber = null;
+
+            PhoneNumber(String phoneNumber) {
+                // numberLength = 7;
+                String currentNumber = phoneNumber.replaceAll(regularExpression, "");
+                if (currentNumber.length() == numberLength)
+                    formattedPhoneNumber = currentNumber;
+                else
+                    formattedPhoneNumber = null;
+            }
+
+            public String getNumber() {
+                return formattedPhoneNumber;
+            }
+
+            // Valid in JDK 8 and later:
+
+            //public void printOriginalNumbers() {
+            //    System.out.println("Original numbers are " + phoneNumber1 +
+            //        " and " + phoneNumber2);
+            //}
+        }
+
+        PhoneNumber myNumber1 = new PhoneNumber(phoneNumber1);
+        PhoneNumber myNumber2 = new PhoneNumber(phoneNumber2);
+
+        // Valid in JDK 8 and later:
+        // myNumber1.printOriginalNumbers();
+
+        if (myNumber1.getNumber() == null)
+            System.out.println("First number is invalid");
+        else
+            System.out.println("First number is " + myNumber1.getNumber());
+        if (myNumber2.getNumber() == null)
+            System.out.println("Second number is invalid");
+        else
+            System.out.println("Second number is " + myNumber2.getNumber());
+
+    }
+
+    public static void main(String... args) {
+        validatePhoneNumber("123-456-7890", "456-7890");
+    }
+}
+```
+
+> You cannot declare static initializers or member interfaces in a local class. The following code excerpt does not compile because the method EnglishGoodbye.sayGoodbye is declared static. The compiler generates an error similar to "modifier 'static' is only allowed in constant variable declaration" when it encounters this method definition:
+> https://docs.oracle.com/javase/tutorial/java/javaOO/localclasses.html
+``` java
+ public void greetInEnglish() {
+        interface HelloThere { // -> compile error
+            void greet();
+        }
+        class EnglishHelloThere implements HelloThere {
+            public void greet() {
+                System.out.println("Hello ");
+            }
+        }
+        HelloThere myGreeting = new EnglishHelloThere();
+        myGreeting.greet();
+    }
+```
+
+
+> Example for inner interface
+``` java
+public class Button {
+    private String title;
+    private OnClickListener onClickListener;
+
+    public Button(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setOnClickListener(OnClickListener onClickListener){
+        this.onClickListener = onClickListener;
+    }
+
+    public void onClick(){
+        this.onClickListener.onClick(this.title);  
+    }
+
+    // Inner interface 
+    public interface OnClickListener{
+        void onClick(String title);
+    }
+}
+
+public class Main {
+    private static Scanner scanner = new Scanner(System.in);
+    private static Button btnPRint = new Button("Print");
+
+    public static void main(String[] args) {
+
+        // Another inner class
+        class ClickListener implements Button.OnClickListener{  // Implementing inner class interface 
+            public ClickListener() {
+                System.out.println("I've been attached");
+            }
+
+            // Forced to implement inner interface methods
+            @Override
+            public void onClick(String title) {
+                System.out.println(title + " was clicked");
+            }
+        }
+
+        btnPRint.setOnClickListener(new ClickListener());  // Passing new object
+        listen();
+    }
+
+    private static void listen(){
+        boolean quit = false;
+        while (!quit){
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            switch (choice){
+                case 0:
+                    quit = true;
+                    break;
+                case 1:
+                    btnPRint.onClick();
+            }
+        }
+    }
+}
+```
+
+> **Anonymous class**
+>- Extends Class
+``` java
+// Copy & paste in *.java file -> it will run first main method.. Comment to see others..
+class HelloWorld { // superclass
+    void displayMessage() {
+        System.out.println("Hello World");
+    }
+}
+
+
+class Tester {
+    public static void main(String args[]){
+        HelloWorld hw = new HelloWorld() {
+            void displayMessage() {
+                System.out.println("Hello Earth");
+            }
+        };
+        hw.displayMessage();
+    }
+}
+
+class Tester2 {
+    public static void main(String args[]){
+        HelloWorld hw = new HelloWorld() {
+            @Override
+            void displayMessage() {
+                System.out.println("Hello Earth");
+            }
+            void displayError() {
+                System.out.println("Don\'t create new methods in an anonymous inner class.");
+            }
+        };
+        hw.displayMessage();
+        //hw.displayError();
+    }
+}
+
+class Tester3 {
+    public static void main(String args[]){
+        reallyStrange(new HelloWorld());  // -> Prints "Hello World" -> use original method
+        reallyStrange(new HelloWorld(){   // -> Prints "Really strange stuff!" -> use overridden method
+            @Override
+            void displayMessage(){
+                System.out.println("Really strange stuff!");
+            }
+        });
+    }
+
+    static void reallyStrange(HelloWorld hw){
+        hw.displayMessage();
+    }
+}
+```
+
+>- Implements interface 
+``` java
+public class HelloWorldAnonymousClasses {
+
+    interface HelloWorld {
+        public void greet();
+        public void greetSomeone(String someone);
+    }
+
+    public void sayHello() {
+
+        class EnglishGreeting implements HelloWorld {
+            String name = "world";
+            public void greet() {
+                greetSomeone("world");
+            }
+            public void greetSomeone(String someone) {
+                name = someone;
+                System.out.println("Hello " + name);
+            }
+        }
+
+        HelloWorld englishGreeting = new EnglishGreeting();
+
+        HelloWorld frenchGreeting = new HelloWorld() {
+            String name = "tout le monde";
+            public void greet() {
+                greetSomeone("tout le monde");
+            }
+            public void greetSomeone(String someone) {
+                name = someone;
+                System.out.println("Salut " + name);
+            }
+        };
+
+        HelloWorld spanishGreeting = new HelloWorld() {
+            String name = "mundo";
+            public void greet() {
+                greetSomeone("mundo");
+            }
+            public void greetSomeone(String someone) {
+                name = someone;
+                System.out.println("Hola, " + name);
+            }
+        };
+        englishGreeting.greet();             // -> Prints "Hello World"
+        frenchGreeting.greetSomeone("Fred"); // -> Prints "Salut Fred"
+        spanishGreeting.greet();             // -> PRints "Hola, mundo"
+    }
+
+    public static void main(String... args) {
+        HelloWorldAnonymousClasses myApp = new HelloWorldAnonymousClasses();
+        myApp.sayHello();
+    }
+}
+```
+
+
+> **Abstract class**
+>- Cannot instantiate an abstract class
+>- Abstract classes are extended not implemented
+>- Decision based "Is A" vs "Has A" relationship
+
+``` java
+public abstract class Animal {
+
+    private String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+
+    public abstract void eat();
+    public abstract void breathe();
+
+    public String getName() {
+        return name;
+    }
+}
+
+public interface CanFly {
+    void fly();
+    //void Test();  // -> If this was set see comments starting with *
+}
+
+public abstract class Bird extends Animal implements CanFly {
+
+    public Bird(String name) {
+        super(name);
+    }
+
+    @Override
+    public void eat() {
+        System.out.println(this.getName() + " is pecking");
+    }
+
+    @Override
+    public void breathe() {
+        System.out.println("Breathe in, breathe out, repeat");
+    }
+
+    @Override
+    public void fly() {
+        System.out.println(getName() + " is flapping its wing");
+    }
+
+    //@Override
+    //public void Test() { }  -> * Not required to implement because it's an abstract class
+}
+
+
+
+public class Penguin extends Bird {
+
+    public Penguin(String name) {
+        super(name);
+    }
+
+    @Override
+    public void fly() {     // -> Can be overridden
+        super.fly();
+        System.out.println("I'm not good at this");
+    }
+
+//    @Override
+//    public void Test() { }  -> * this will need to be implemented if not already done so in inherited abstract class
+}
+
+
+public class Parrot extends Bird {
+
+    public Parrot(String name) {
+        super(name);
+    }
+
+//    @Override
+//    public void fly() { super.fly(); }  -> Not required as already implemented in abstract class
+
+//    @Override
+//    public void Test() { }  -> * this will need to be implemented if not already done so in inherited abstract class
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog dog = new Dog("Yorkie");
+        dog.eat();       // -> Yorkie is eating
+        dog.breathe();   // -> Breathe in, breathe out, repeat
+
+        Parrot parrot = new Parrot("Australian Parrot");
+        parrot.eat();     // -> Australian Parrot is pecking
+        parrot.breathe(); // -> Breathe in, breathe out, repeat
+        parrot.fly();     // -> Australian Parrot is flapping its wing
+
+        Penguin penguin = new Penguin("Emperor");
+        penguin.fly();    // -> Emperor is flapping its win \n I'm not good at this
+
     }
 }
 ```
