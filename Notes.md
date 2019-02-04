@@ -792,6 +792,33 @@ An iterator for lists that allows the programmer to traverse the list in either 
 
 
 ## **Inteface**
+> Interface is just the declaration of methods of a Clas, it's not the implementation
+> In an interface, we define what kind of operation an object can perform.  These operations are defined by the classes that implement the interface
+> Interfaces form a contract between the class and the otuside world, and this contract is enforced at build time by the compiler
+> You cannot instantiate them, and they may contain a mix of methods declared with or without an implementation.  All methods in the interfaces are automatically public and abstract
+> By introducing interaces into your program, you are really introducing points of variation at which you can plug in different implementations for that interface.  An interfaces primary purposes is abstraction, decoupling the "what" from the "how"
+> **NOTE** 
+>- Since Java 8 interfaces can contain default methods.  In other words methods with implementation.  The keyword default is used (mostly for backwards compatibility), and static methods as well before Java 8 that was not possible.
+>- Since Java 9 interfaces can also contain private methods (commonly used when two default methods in an Interface share commo n code
+``` java
+public interface Test {
+    void doSomething();
+    default void defaultMethod(){
+        System.out.printf("default method allow since Java 8");
+    };
+
+    private void shareByDefaultMethod(){
+        System.out.printf("Java 9 - private method allowed, usually used for common methods of default methods");
+    }
+}
+```
+> **When to use an Interface** 
+>- You expect that unrelated calsses will implement your interface. E.g the interfaces Comparable and Cloneable are implemented by many unrelated classes.
+>- You want to specify the behaviour of a particular data type, but you are not concerned about who implements its behaviour
+>- You want to sperate different behaviour
+>- The collections API is an excellent example, we have the List interface and implementation ArrayList and LinkedList
+>- The JDBC API is another excellent example.  It exist of almost only interfaces.  The concrete implementations are provided as "JDBC drivers".  This enables you to write all the JDBC code independent of the DB vendor.
+
 > Interface is a pure abstract class
 ``` java
 // What we declare
@@ -1184,6 +1211,17 @@ public class HelloWorldAnonymousClasses {
 >- Cannot instantiate an abstract class
 >- Abstract classes are extended not implemented
 >- Decision based "Is A" vs "Has A" relationship
+> Abstract classes are similar to Interfaces. You cannot instantiate them, and they may contain a mix of methods declared with or without an implementation
+> However, with Abstract classes, you can decalre fields that not static and final, and define public, protected, private concrete methods
+> An Abstract class can extend only one parent class but it can implement multiple interfaces
+> When an Abstract class is subclassed, the subclass usually provides implementations for all of the abstract methods in it parent class
+> However, if it does not, then the subclass must also be declared abstract
+> Use an abstract class when
+>- You want to share code among several closely related classes (Animal - with fields name. name...)
+>- You expect classes that extend your abstract class to have many commond methods or fields or required access modifiers other than public (protected, private)
+>- You want to declare non static or non fial fields, this enables you to define methods thatn can access and modify the state of an object (getName, setName).
+>- When you have a requirement for your base class to provide a default implementation of certain methods but other methods should be open to being overridden by child classes
+>- **Summary:** The purpose of abstract class is to provide a common definiton of a base class that multiple derived calsses can share
 
 ``` java
 public abstract class Animal {
@@ -1281,3 +1319,6 @@ public class Main {
     }
 }
 ```
+
+## **Abstract Classes**
+
