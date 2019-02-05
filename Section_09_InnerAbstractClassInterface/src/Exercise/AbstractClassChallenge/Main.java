@@ -67,5 +67,20 @@ public class Main {
         }
 
         list.traverse(list.getRoot());
+
+        // ================================
+//        SearchTree tree = new SearchTree(null);
+//        tree.traverse(tree.getRoot());
+//
+//        String stringTreeData = "Darwin Brisbane Perth Melbourne Canberra Adelaide Sydney Canberra";
+//
+//        String[] dataTree = stringTreeData.split(" ");
+//        for (String s : dataTree) {
+//            // create new item with value set to the string s
+//            tree.addItem(new Node(s));
+//        }
+//
+//        tree.traverse(tree.getRoot());
+
     }
 }

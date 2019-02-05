@@ -1321,4 +1321,14 @@ public class Main {
 ```
 
 ## **Abstract Classes**
+> //TODO -> review abstract classes challenge
 
+
+
+## **Generics**
+> T can extend only one class(first in the list) and add multiple interfaces
+``` java
+public class Team <T extends Player & Coach & Manager {  // -> Player is a class (needs to be first); Coach & Manager are interfaces
+}
+
+```
