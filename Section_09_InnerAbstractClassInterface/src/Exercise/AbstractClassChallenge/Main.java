@@ -60,6 +60,7 @@ public class Main {
         String[] data = stringData.split(" ");
         for (String s : data) {
             // create new item with value set to the string s
+
         }
     }
 }
