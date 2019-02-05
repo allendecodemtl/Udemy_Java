@@ -1330,5 +1330,52 @@ public class Main {
 ``` java
 public class Team <T extends Player & Coach & Manager {  // -> Player is a class (needs to be first); Coach & Manager are interfaces
 }
-
 ```
+
+## **Java Naming Convention**
+> Things you will name in java are:
+>- Packages
+>- * Always lower case
+>- * Package names should be unique
+>- * Use your internet domain name, reversed, as a prefix for the package name
+>- * Replace invalid characters (i.e -) in domain name with an underscore
+>- * Domain name components starting with a number should instead start with an underscore_
+>- * Domain name components that are java keywords should have the component start with an underscore_
+>- * E.g Switch.supplier.com -> com.supplier._switch
+>- * E.g 1world.com -> com._1world
+>- * E.g Experts-exchange.com -> com.experts_exchange
+>- Classes
+>- * CamelCase
+>- * Class names should be nouns (they reperesent things)
+>- * Should start with a capital letter
+>- * Each word in the name should also start with a capital (e.g LinkedList)
+>- Interfaces
+>- * Capitalized like class names (CamelCase)
+>- * Consider what objects implementing the interface will become of what they will be able to do
+>- Methods
+>- * mixedCase
+>- * Often verbs
+>- * Reflect the function performed or the result returned
+>- Contants
+>- * All UPPER_CASE
+>- * Seperate words with underscore_
+>- * Declared using the final keyword
+>- * E.g static final int MAX_INT
+>- * E.g static final short SEVERITY_ERRO
+>- * E.g static final double P1 = 3.141592653
+>- Variables
+>- * mixedCase
+>- * Meaningful and indicative
+>- * Start with lower case leter
+>- * Do not use underscores_
+>- Type parameters (generics)
+>- * Single character, capital letters
+>- * E.g E - element
+>- * E.g K - Key
+>- * E.g T - Type
+>- * E.g V - Value
+>- * E.g S, U, V - 2nd, 3rd, 4th types
+
+
+## **Packages**
+> 
