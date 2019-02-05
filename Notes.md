@@ -792,11 +792,11 @@ An iterator for lists that allows the programmer to traverse the list in either 
 
 
 ## **Inteface**
-> Interface is just the declaration of methods of a Clas, it's not the implementation
+> Interface is just the declaration of methods of a Class, it's not the implementation
 > In an interface, we define what kind of operation an object can perform.  These operations are defined by the classes that implement the interface
-> Interfaces form a contract between the class and the otuside world, and this contract is enforced at build time by the compiler
+> Interfaces form a contract between the class and the outside world, and this contract is enforced at build time by the compiler
 > You cannot instantiate them, and they may contain a mix of methods declared with or without an implementation.  All methods in the interfaces are automatically public and abstract
-> By introducing interaces into your program, you are really introducing points of variation at which you can plug in different implementations for that interface.  An interfaces primary purposes is abstraction, decoupling the "what" from the "how"
+> By introducing interfaces into your program, you are really introducing points of variation at which you can plug in different implementations for that interface.  An interfaces primary purposes is abstraction, decoupling the "what" from the "how"
 > **NOTE** 
 >- Since Java 8 interfaces can contain default methods.  In other words methods with implementation.  The keyword default is used (mostly for backwards compatibility), and static methods as well before Java 8 that was not possible.
 >- Since Java 9 interfaces can also contain private methods (commonly used when two default methods in an Interface share commo n code
@@ -823,7 +823,7 @@ public interface Test {
 ``` java
 // What we declare
 public interface Moveable{
-    int AVG_SPEED = 40;  // -> always need to be decaled; otherwise error
+    int AVG_SPEED = 40;  // -> always need to be declared; otherwise error
     void move()
 }
 
@@ -1424,4 +1424,85 @@ public class ScopeCheck {
         }
     }
 }
+```
+
+## **Access Modifiers**
+> Top Level
+>- Only classes, interfaces and enums can exist at the top level, everything else must be included within one of these
+>- * **public:** the object is visible to all classes everywhere, whether they are in the same package or have imported the package containing the public class
+``` java
+public class Main{}
+public interface Accessible{}
+public enum EnumTest {}
+```
+>- * **package-private:** the object is only available within its own package (and is visible to every class within the same package).  Package-private is specified by not specifying i.e it is the default if you do not specify public.  There is not a "package-private" keyword
+``` java
+class Main{}
+interface Accessible{}
+enum EnumTest {}
+```
+
+> Member level
+>- * **public:** at the member level, public has the same meaning as at top level.  A public class member(of field) and public method can be accessed from any other class anywhere, even in a different package
+>- * **package-private:** this also has the same meaning as it does at the top level.  An object with no access modifier is visible to every class within the same package (but not to class in external packages)
+>- * **private:** the object is only visible within the class it is declared.  It is not visible anywhere else (including in subclasses of its class).
+>- * **protected:** the object is visible anywhere in its own package (like package-private) but also in subclasses even if they are in another package
+
+``` java
+interface Accessible {          // -> package-private
+    int SOME_CONTSTANT = 100;   // -> public static final
+    public void methodA();      // -> public abstract
+    void methodB();             // -> public abstract
+    boolean methodC();          // -> public abstract
+}
+```
+
+## **Static**
+> Can be accessed by calling ClassName.Method() or ClassName.Variable;
+> Static methods **cannot** access none static methods and variables;
+> Non-static methods **can** access static methods and variables;
+
+## **Final**
+> On class - cannot be subclassed i.e cannot be extended
+> On constructor - cannot be instantiated
+> On methods - cannot be overridden
+> On class variables - needs to be instantiated before constructor is finished instantiating
+
+``` java
+public class SIBTest {
+    public static final String owner;
+
+    static {
+        owner = "tim";
+        System.out.println("SIBTest static initialisation block called");
+    }
+
+    public SIBTest() {
+        System.out.println("SIB constructor called");
+    }
+
+    static {
+        System.out.println("2nd initialisation block called");
+    }
+
+    public void someMethod(){
+        System.out.println("someMethod called");
+    }
+}
+
+public static void main(String[] args) {
+    System.out.println("Main method called");
+    SIBTest test = new SIBTest();
+    test.someMethod();
+    System.out.println("Owner is " + SIBTest.owner);
+}
+```
+> Output
+```
+Main method called
+SIBTest static initialisation block called  // -> All static block called in sequence
+2nd initialisation block called // -> All static block called in sequence
+SIB constructor called          // -> After all static block instantiated -> constructor is called
+someMethod called
+Owner is tim
 ```

@@ -1,4 +1,4 @@
-package com.Exercise;
+package com.Exercise.ScopeChallenge;
 
 import java.util.Scanner;
 
