@@ -496,7 +496,7 @@ System.out.println("Sum even num: " + sumEven);
 
 ## **this() vs super()**
 >- Use **this()** to call a constructor from another overloaded constructor in the same class
->- The call to **this()** can be used only in a constructor and must be the first statement in the constructor. It's used with constructor chaining (when one constructor calls another constructor) and helps to reduce duplciated code
+>- The call to **this()** can be used only in a constructor and must be the first statement in the constructor. It's used with constructor chaining (when one constructor calls another constructor) and helps to reduce duplicated code
 >- Only way to call a parent constructor is by calling **super()**
 >- Java compiler puts a default call to **super()** if we don't add it, and it is always the no-args **super** which is inserted by compiler (constructor without arguments)
 >- Even **abstract classes** hav constructors, although can never instantiate using the new keyword
@@ -555,7 +555,7 @@ public Account(String number, double balance, String customerName, String custom
 ```
 
 ## **Inheritance**
-> Calling super and overiding methods
+> Calling super and overriding methods
 ``` java
 public class Animal {
     // Declare Variables here
@@ -689,7 +689,7 @@ System.out.println(myIntVariable[5]);    // Print 6
 ``` java
 ....{
 int[] myIntArray = new int[5];  // -> Here myIntArray hold a reference to the object int[5] which is stored somewhere else in mem
-int[] anotherArray = myIntArray; // -> Here anotherArray hold the referenc to the object int[5]
+int[] anotherArray = myIntArray; // -> Here anotherArray hold the reference to the object int[5]
 System.out.println("myIntArray = " + Arrays.toString(myIntArray)); // -> [0, 0, 0, 0, 0]
 System.out.println("anotherArray = " + Arrays.toString(anotherArray)); // -> [0, 0, 0, 0, 0]
 anotherArray[0] = 1;
@@ -924,7 +924,7 @@ public class ShadowTest {
         void methodInFirstLevel(int x) {
             System.out.println("x = " + x);
             System.out.println("this.x = " + this.x);
-            System.out.println("ShadowTest.this.x = " + ShadowTest.this.x);
+            System.out.println("ShadowTest.this.x = " + ShadowTest.this.x); // Applicable to methods too ShadowTest.this.getMethod();
         }
     }
 
@@ -1379,3 +1379,49 @@ public class Team <T extends Player & Coach & Manager {  // -> Player is a class
 
 ## **Packages**
 > 
+``` java
+import javafx.scene.Node;
+import org.w3c.dom.Node; // Compile error - conflict with first import
+
+public class App
+{
+    public static void main( String[] args )
+    {
+        Node node = null;
+        org.w3c.dom.Node anotherNode = null;
+    }
+}
+
+// If need both, don't import, refer to them specifically
+public class App
+{
+    public static void main( String[] args ) {
+        javafx.scene.Node node = null;
+        org.w3c.dom.Node anotherNode = null;
+    }
+}
+```
+
+## **Scope**
+``` java
+public class ScopeCheck {
+    public int publicVar = 0;
+    private int privateVar = 1;
+
+    public ScopeCheck() {
+        System.out.println("ScopeCheck created, publicVar = " + publicVar + "; privateVar = " + privateVar);
+    }
+
+    public int getPrivateVar() {
+        return privateVar;
+    }
+
+    public void timesTwo(){
+        int privateVar = 2; 
+        for (int i=0; i<10 ;i++){
+            System.out.println(i + " times two is " + (i * privateVar));  // Check if variable exist in scope, otherwise, move to member var
+            System.out.println(i + " this.privateVar " + (i * this.privateVar)); // Specifically refering to class variable
+        }
+    }
+}
+```
