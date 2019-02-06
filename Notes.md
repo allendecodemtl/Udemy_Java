@@ -1872,3 +1872,7 @@ building
 You are inside a building
 a well house for a small spring
 ```
+
+
+## **Immutable Classes**
+https://docs.oracle.com/javase/tutorial/essential/concurrency/imstrat.html
