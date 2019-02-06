@@ -1510,6 +1510,8 @@ Owner is tim
 
 ## **Java Collections**
 
+![Collections](images/img_0003.png)
+
 The following list describes the core collection interfaces:
 
 > **Collection** — the root of the collection hierarchy. A collection represents a group of objects known as its elements. The Collection interface is the least common denominator that all collections implement and is used to pass collections around and to manipulate them when maximum generality is desired. Some types of collections allow duplicate elements, and others do not. Some are ordered and others are unordered. The Java platform doesn't provide any direct implementations of this interface but provides implementations of more specific subinterfaces, such as Set and List. Also see The Collection Interface section.
