@@ -1331,6 +1331,7 @@ public class Main {
 public class Team <T extends Player & Coach & Manager {  // -> Player is a class (needs to be first); Coach & Manager are interfaces
 }
 ```
+> //TODO - More to research e.g wildcards <?>
 
 ## **Java Naming Convention**
 > Things you will name in java are:
@@ -1528,3 +1529,282 @@ Deques can be used both as FIFO (first-in, first-out) and LIFO (last-in, first-o
 The last two core collection interfaces are merely sorted versions of Set and Map:
 > **SortedSet** — a Set that maintains its elements in ascending order. Several additional operations are provided to take advantage of the ordering. Sorted sets are used for naturally ordered sets, such as word lists and membership rolls. Also see The SortedSet Interface section.
 > **SortedMap** — a Map that maintains its mappings in ascending key order. This is the Map analog of SortedSet. Sorted maps are used for naturally ordered collections of key/value pairs, such as dictionaries and telephone directories. Also see The SortedMap Interface section.
+
+## **Binay Search**
+``` java
+public boolean reserveSeat(String seatNumber) {
+//====================================================
+//  Binary search from java source code - modified
+//====================================================
+    int low = 0;
+    int high = seats.size()-1;
+
+    while (low <= high) {
+        System.out.print(".");
+        int mid = (low + high) / 2;
+        Seat midVal = seats.get(mid);
+        int cmp = midVal.getSeatNumber().compareTo(seatNumber);
+
+        if (cmp < 0) {
+            low = mid + 1;
+        } else if (cmp > 0) {
+            high = mid - 1;
+        } else {
+            return seats.get(mid).reserve();
+        }
+    }
+    System.out.println("There is no seat " + seatNumber);
+    return false;
+//====================================================
+//  Accessing binary search from collections - Most efficient
+//====================================================
+    // Seat requestedSeat = new Seat(seatNumber);
+    // int foundSeat = Collections.binarySearch(seats, requestedSeat, null);
+    // if (foundSeat >= 0){
+    //     return seats.get(foundSeat).reserve();
+    // } else {
+    //     System.out.println("There is not seat " + seatNumber);
+    //     return false;
+    // }
+}
+```
+
+
+## **Shallow vs Deep Copy**
+
+``` java
+public class Main {
+    public static void main(String[] args) {
+        Theatre theatre = new Theatre("Olympia", 8,12);
+        //theatre.getSeats();
+
+//        if(theatre.reserveSeat("H11")){
+//            System.out.println("Please pay");
+//        } else {
+//            System.out.println("Sorry seat is taken");
+//        }
+//
+//        if(theatre.reserveSeat("H11")){
+//            System.out.println("Please pay");
+//        } else {
+//            System.out.println("Sorry seat is taken");
+//        }
+
+        // Shallow copy - arraylist have the same shared objects - pointing to same obj
+        List<Theatre.Seat> seatCopy = new ArrayList<>(theatre.seats);
+        printList(seatCopy);
+        seatCopy.get(1).reserve();
+        if(theatre.reserveSeat("A02")){
+            System.out.println("Please pay for seat");
+        } else {
+            System.out.println("Seat already reserved");
+        }
+
+//        Collections.reverse(seatCopy);
+//        System.out.println("Printing seatCopy");
+//        printList(seatCopy);
+//        System.out.println("Printing theatre.seat");
+//        printList(theatre.seats);
+
+
+        Collections.shuffle(seatCopy);  // Shuffle the arraylist
+        System.out.println("Printing seatCopy");
+        printList(seatCopy);            // Print IN shuffle order
+        System.out.println("Printing theatre.seat");
+        printList(theatre.seats);       // Print order entered
+
+        Theatre.Seat minSeat = Collections.min(seatCopy);
+        Theatre.Seat maxSeat = Collections.max(seatCopy);
+        System.out.println("Min seat number is " + minSeat.getSeatNumber());  // Use compareTo method to calc - does not need to be sorted first
+        System.out.println("Max seat number is " + maxSeat.getSeatNumber());  // Use compareTo method to calc - does not need to be sorted first
+
+        sortList(seatCopy);
+        System.out.println("Printing sorted seatcopy");
+        printList(seatCopy);
+        
+        // Try to deep copy but fail at runtime - because below code only set the size
+        // It actually needs to have the object initialised (empty of not) in the list
+        // List<Theatre.Seat> newList = new ArrayList<>(theatre.seats.size());
+        // Collections.copy(newList, theatre.seats);
+    }
+
+    public static void printList(List<Theatre.Seat> list){
+        for (Theatre.Seat seat : list){
+            System.out.print(" " + seat.getSeatNumber());
+        }
+        System.out.println();
+        System.out.println("======================================================");
+    }
+
+    // Inefficient sort algo - use build in version
+    public static void sortList(List<? extends Theatre.Seat> list){
+        for (int i=0; i<list.size()-1;i++){
+            for (int j=i+1; j<list.size();j++){
+                if(list.get(i).compareTo(list.get(j)) > 0){
+                    Collections.swap(list, i, j);
+                }
+            }
+        }
+    }
+}
+      
+```
+``` java
+
+public class Theatre {
+    private final String theatreName;
+    public List<Seat> seats = new ArrayList<>();
+
+    public Theatre(String theatreName, int numRows, int seatsPerRow) {
+        this.theatreName = theatreName;
+        int lastRow = 'A' + (numRows - 1);
+        for (char row = 'A'; row <= lastRow; row++) {
+            for (int seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
+                Seat seat = new Seat(row + String.format("%02d", seatNum));
+                seats.add(seat);
+            }
+        }
+    }
+
+    public String getTheatreName() {
+        return theatreName;
+    }
+
+    public boolean reserveSeat(String seatNumber) {
+//====================================================
+//  Binary search from java source code - modified
+//====================================================
+        int low = 0;
+        int high = seats.size()-1;
+
+        while (low <= high) {
+            System.out.print(".");
+            int mid = (low + high) / 2;
+            Seat midVal = seats.get(mid);
+            int cmp = midVal.getSeatNumber().compareTo(seatNumber);
+
+            if (cmp < 0) {
+                low = mid + 1;
+            } else if (cmp > 0) {
+                high = mid - 1;
+            } else {
+                return seats.get(mid).reserve();
+            }
+        }
+        System.out.println("There is no seat " + seatNumber);
+        return false;
+//====================================================
+//  Accessing binary search from collections - Most efficient
+//====================================================
+//        Seat requestedSeat = new Seat(seatNumber);
+//        int foundSeat = Collections.binarySearch(seats, requestedSeat, null);
+//        if (foundSeat >= 0){
+//            return seats.get(foundSeat).reserve();
+//        } else {
+//            System.out.println("There is not seat " + seatNumber);
+//            return false;
+//        }
+
+//====================================================
+//  Inefficient basic traversal
+//====================================================
+//        for (Seat seat : seats) {
+//            System.out.print(".");
+//            if (seat.getSeatNumber().equals(seatNumber)) {
+//                requestedSeat = seat;
+//                break;
+//            }
+//        }
+
+//        if (requestedSeat == null) {
+//            System.out.println("There is not seat " + seatNumber);
+//            return false;
+//        }
+//
+//        return requestedSeat.reserve();
+    }
+
+    // for testing
+    public void getSeats() {
+        for (Seat seat : seats) {
+            System.out.println(seat.getSeatNumber());
+        }
+    }
+
+    // For testing purposes - set to public - usually set to private
+    public class Seat implements Comparable<Seat>{
+        private final String seatNumber;
+        private boolean reserved = false;
+
+        public Seat(String seatNumber) {
+            this.seatNumber = seatNumber;
+        }
+
+        @Override
+        public int compareTo(Seat seat) {
+            return this.seatNumber.compareToIgnoreCase(seat.getSeatNumber());
+        }
+
+        public boolean reserve(){
+            if (!this.reserved){
+                this.reserved = true;
+                System.out.println("Seat " + seatNumber + " reserved");
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public boolean cancel(){
+            if(this.reserved){
+                this.reserved = false;
+                System.out.println("Reservation of seat " + seatNumber + " cancelled");
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
+        public String getSeatNumber(){
+            return seatNumber;
+        }
+
+    }
+}
+```
+
+
+## **Comparable vs Comparator**
+
+> Comparable - just need to implement it and override the compareTo method
+``` java
+@Override
+public int compareTo(Seat seat) {
+    return this.seatNumber.compareToIgnoreCase(seat.getSeatNumber());
+}
+```
+
+> Comparator
+``` java
+// Anonymous inner class - Implementing interface
+static final Comparator<Seat> PRICE_ORDER = new Comparator<Seat>() {
+    @Override
+    public int compare(Seat seat1, Seat seat2) {
+        if(seat1.getPrice() < seat2.getPrice()){  // Have issues = if same price, doesn't mean it is the same object, need to do some further if statement to match the some kind of primary keys on the object
+            return -1;
+        } else if (seat1.getPrice() > seat2.getPrice()){
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+};
+
+List<Theatre.Seat> priceSeat = new ArrayList<>(theatre.getSeats());
+priceSeat.add(theatre.new Seat("B00", 13.00));
+priceSeat.add(theatre.new Seat("A00", 13.00));
+Collections.sort(priceSeat, Theatre.PRICE_ORDER);
+printList(priceSeat);
+
+```
