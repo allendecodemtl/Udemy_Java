@@ -1889,3 +1889,288 @@ https://docs.oracle.com/javase/tutorial/essential/concurrency/imstrat.html
 ```
 
 
+
+## **Lambda Expressions**
+> Same like callback in javascript
+> Single line 
+``` java
+interface UpperConcat {
+    String upperAndConcat(String s1, String s2);
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+        UpperConcat uc = (s1, s2) -> s1.toUpperCase() +  s2.toUpperCase();  // Initialising an implementing overridden method
+        String sillyString = doStringStuff(uc, "Jack Hill" , "John Doe");
+
+        // Passing initialised anonymous class by overriding/implementing upperAndConcat method declaration in interface 
+        String sillyString2 = doStringStuff((s1, s2) -> s1.toUpperCase() +  s2.toUpperCase(), "Jack Hill" , "John Doe");
+
+        System.out.println(sillyString);  // -> Prints "JACK HILLJOHN DOE"
+        System.out.println(sillyString2); // -> Prints "JACK HILLJOHN DOE"
+    }
+
+    public final static String doStringStuff(UpperConcat uc, String s1, String s2) {
+        return uc.upperAndConcat(s1, s2);
+    }
+}
+```
+
+> Nested Block
+>- review code block - access to variables - need to be final or shouldn't change
+``` java
+public class Main {
+    public static void main(String[] args) {
+        AnotherClass anotherClass = new AnotherClass();
+        String s1 = anotherClass.doSomething1();
+        System.out.println("==========================================");
+        String s2 = anotherClass.doSomething2();
+        System.out.println("==========================================");
+        String s3 = anotherClass.doSomething3();
+        System.out.println("==========================================");
+        String s4 = anotherClass.doSomething4();
+        System.out.println("==========================================");
+        anotherClass.printValue();
+        System.out.println("==========================================");
+        System.out.println(s1);
+        System.out.println("==========================================");
+        System.out.println(s2);
+        System.out.println("==========================================");
+        System.out.println(s3);
+        System.out.println("==========================================");
+        System.out.println(s4);
+    }
+
+    public final static String doStringStuff(UpperConcat uc, String s1, String s2) {
+        return uc.upperAndConcat(s1, s2);
+    }
+}
+
+interface UpperConcat {
+    String upperAndConcat(String s1, String s2);
+}
+
+class AnotherClass{
+    public String doSomething1(){
+        UpperConcat uc = (s1, s2) -> {
+            System.out.println("The lambda expressions's class is: " + getClass().getSimpleName());  // -> Returns "AnotherClass"
+            String result = s1.toUpperCase() + s2.toUpperCase();
+            return result;
+        };
+
+        System.out.println("The AnotherClass class's name is: " + getClass().getSimpleName());      // -> Returns "AnotherClass"
+        return Main.doStringStuff(uc,"String1", "String2");
+    }
+
+    public String doSomething2(){
+        System.out.println("The AnotherClass class's name is: " + getClass().getSimpleName());        // -> Returns "AnotherClass"
+        return Main.doStringStuff(new UpperConcat() {
+            @Override
+            public String upperAndConcat(String s1, String s2) {
+                System.out.println("The anonymous class's name is: " + getClass().getSimpleName());     // -> Returns ""
+                return s1.toUpperCase() +  s2.toUpperCase();
+            }
+        }, "String1","String2");
+    }
+
+    public String doSomething3(){
+        final int i = 0;  // Must be set to final if passed to anonymous class
+        {
+            UpperConcat uc = new UpperConcat() {
+                @Override
+                public String upperAndConcat(String s1, String s2) {
+                    System.out.println("i [within anonymous class] = " + i);
+                    return s1.toUpperCase() + s2.toUpperCase();
+                }
+            };
+
+            System.out.println("The AnotherClass class's name is: " + getClass().getSimpleName());
+
+            //i++;   -> Cannot be mutated because it is final
+            System.out.println("i = " + i);
+            return Main.doStringStuff(uc,"String1", "String2");
+        }
+    }
+
+    public String doSomething4(){
+        int i = 0;
+        //i++;
+
+        UpperConcat uc = (s1, s2) -> {
+            System.out.println("The lambda expressions's class is: " + getClass().getSimpleName());
+            System.out.println("i in lambda expression = " + i);  // -> i needs to be declared final or never change -> will have compile error e.g if we add i++
+            String result = s1.toUpperCase() + s2.toUpperCase();
+            return result;
+        };
+
+        // s1 = "Hello" -> Scope - only accessible in the block
+
+        System.out.println("The AnotherClass class's name is: " + getClass().getSimpleName());
+        return Main.doStringStuff(uc,"String1", "String2");
+    }
+
+    public void printValue(){
+        int number = 25;
+
+        Runnable r = () -> {
+            try{
+                Thread.sleep(5000);
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+            System.out.printf("The value is " + (number - 10));  // Can be changed inside the lambda expression but cannot outside by default it's final outside
+        };
+
+        new Thread(r).start();
+    }
+}
+```
+> Output
+```
+The AnotherClass class's name is: AnotherClass
+The lambda expressions's class is: AnotherClass
+==========================================
+The AnotherClass class's name is: AnotherClass
+The anonymous class's name is: 
+==========================================
+The AnotherClass class's name is: AnotherClass
+i = 0
+i [within anonymous class] = 0
+==========================================
+The AnotherClass class's name is: AnotherClass
+The lambda expressions's class is: AnotherClass
+i in lambda expression = 0
+==========================================
+==========================================
+STRING1STRING2
+==========================================
+STRING1STRING2
+==========================================
+STRING1STRING2
+==========================================
+STRING1STRING2
+The value is 15    // Comments -> prints last because it slept for 5 sec
+```
+
+> Example with for loop
+
+``` java 
+public static void main(String[] args) {
+    Employee john = new Employee("John Doe", 30);
+    Employee tim = new Employee("Tim Buchalka", 21);
+    Employee jack = new Employee("Jack Hill", 40);
+    Employee snow = new Employee("Snow White", 22);
+
+    List<Employee> employees = new ArrayList<>();
+    employees.add(john);
+    employees.add(tim);
+    employees.add(jack);
+    employees.add(snow);
+
+    Employee employee2;
+    for(int i=0; i<employees.size(); i++){
+        employee2 = employees.get(i);             // employee2 being changed here
+        System.out.println(employee2.getAge());
+        new Thread(() -> System.out.println(employee2.getAge())).start();  // compile error because employee2 is not final
+    }
+    System.out.println("===============================================");
+    for(int i=0; i<employees.size(); i++){
+        Employee employee = employees.get(i);     // because new employee (obj) being created here an does not changed after initialisation
+        System.out.println(employee.getAge());
+        new Thread(() -> System.out.println(employee.getAge())).start();   // no compile errors
+    }
+    System.out.println("===============================================");
+    for(Employee employee: employees){           // with enhanced for loop - new local variable is created after each iteration
+        System.out.println(employee.getName());
+        new Thread(() ->System.out.println(employee.getAge())).start(); // therefore not compile error - new obj is final
+    }
+}
+```
+
+## **Lambda Expressions with java.util package**
+> forEach similar to JS
+> use consumer interface
+> https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html
+``` java
+employees.forEach(employee -> {
+    System.out.println(employee.getName());
+    System.out.println(employee.getAge());
+});
+```
+
+Predicate interface built in the java.util package
+> Example
+``` java 
+public class Main {
+    public static void main(String[] args) {
+        Employee john = new Employee("John Doe", 30);
+        Employee tim = new Employee("Tim Buchalka", 21);
+        Employee jack = new Employee("Jack Hill", 40);
+        Employee snow = new Employee("Snow White", 22);
+        Employee red = new Employee("Red RidingHood", 35);
+        Employee charming = new Employee("Prince Charming", 31);
+
+        List<Employee> employees = new ArrayList<>();
+        employees.add(john);
+        employees.add(tim);
+        employees.add(jack);
+        employees.add(snow);
+        employees.add(red);
+        employees.add(charming);
+
+        //action1(employees);
+        //action2(employees);
+        //action3(employees);
+
+        printEmployeesByAge(employees, "Employees over 30", employee -> employee.getAge() > 30);
+        printEmployeesByAge(employees, "Employees 30 and under", employee -> employee.getAge() <= 30);
+
+    }
+
+    public static void action1(List<Employee> employees){
+        employees.forEach(employee -> {
+            System.out.println(employee.getName());
+            System.out.println(employee.getAge());
+        });
+    }
+
+    public static void action2(List<Employee> employees){
+        System.out.println("Employees over 30.");
+        System.out.println("==================");
+        for (Employee employee : employees){
+            if (employee.getAge() > 30){
+                System.out.println(employee.getName());
+            }
+        }
+    }
+
+    public static void action3(List<Employee> employees){
+        System.out.println("Employees over 30.");
+        System.out.println("==================");
+        employees.forEach(employee -> {
+            if (employee.getAge() > 30){
+                System.out.println(employee.getName());
+            }
+        });
+        System.out.println();
+        System.out.println("Employees 30 and younger");
+        System.out.println("==================");
+        employees.forEach(employee -> {
+            if (employee.getAge() <= 30){
+                System.out.println(employee.getName());
+            }
+        });
+    }
+
+    private static void printEmployeesByAge(List<Employee> employees, String ageText, Predicate<Employee> ageCondition){
+        System.out.println(ageText);
+        System.out.println("==================");
+        for (Employee employee : employees) {
+            if (ageCondition.test(employee)){
+                System.out.println(employee.getName());
+            }
+        }
+    }
+}
+```
