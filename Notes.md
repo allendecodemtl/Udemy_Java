@@ -1571,7 +1571,9 @@ public boolean reserveSeat(String seatNumber) {
 
 
 ## **Shallow vs Deep Copy**
-
+> Shallow copy means you have two e.g ArrayList with the same objects as elements.
+> Change one ArrayList (e.g add, remove, reverse) will not affect the other ArrayList.
+> However, mutating the variables in the element/obj themselves, will be reflected in both ArrayList
 ``` java
 public class Main {
     public static void main(String[] args) {
@@ -1807,4 +1809,66 @@ priceSeat.add(theatre.new Seat("A00", 13.00));
 Collections.sort(priceSeat, Theatre.PRICE_ORDER);
 printList(priceSeat);
 
+```
+
+## **Map**
+Set - add dupes - does nothing
+Map - do not add dupes - but overrides
+``` java
+Map<String, String> languages = new HashMap<>();
+// Prints null as there are no dupes
+System.out.println(languages.put("Java", "a compiled high level, object-oriented, platform independent language"));
+System.out.println(languages.put("BASIC", "Beginners All Purposes Symbolic Instruction Code"));
+System.out.println(languages.put("Lisp", "Therein lies madness"));
+// Since there are dupes it will print value of overriden key - " compiled high level, object-oriented, platform independent language"
+System.out.println(languages.put("Java", "test"));
+```
+> Map - use containsKey() method - to check keys
+``` java
+if(languages.containsKey("Java")) {
+    System.out.println("Java is already in the map");
+} else {
+    languages.put("Java", "this course is about Java");
+}
+```
+> Map - use putIfAbsent() method - prevent concurrency issues
+> Map - printout all keys
+``` java
+for(String key: languages.keySet()) {
+    System.out.println(key + " : " + languages.get(key));
+}
+```
+> Map - use remove(key) method -> returns null if not exist or (value) if successful
+> Map - use remove(key, value) method -> returns true/false
+> Map - use replace(key, newValue) -> returns previous value if successful otherwise (e.g if key does not exist) returns null
+> Map - use replace(key, oldValue, newValue)
+>- returns false if oldValue is not exactly likely in map
+>- returns true if replace was successful
+
+
+## **String split() method**
+> 
+``` java
+String[] road = "You are standing at the end of a road before a small brick building".split(" ");
+for (String i : road) {
+    System.out.println(i);
+}
+
+System.out.println("==================================");
+
+String[] building = "You are inside a building, a well house for a small spring".split(", ");
+for (String i : building) {
+    System.out.println(i);
+}
+```
+> Output
+```
+You
+are
+.....
+brick
+building
+==================================
+You are inside a building
+a well house for a small spring
 ```
