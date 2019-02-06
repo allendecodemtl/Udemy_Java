@@ -1876,3 +1876,16 @@ a well house for a small spring
 
 ## **Immutable Classes**
 https://docs.oracle.com/javase/tutorial/essential/concurrency/imstrat.html
+
+## **Sets & HashSet**
+> List - is an ordered collection of items that can contain duplicates
+> Sets
+>- used less often than list and map, but can still be usedful
+>- has no defined ordering number one 
+>- cannot contains dupes
+>- implementation are the hastset and the treeset
+``` java
+
+```
+
+
