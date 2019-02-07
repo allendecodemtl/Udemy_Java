@@ -2240,13 +2240,73 @@ Matcher matcher = pattern.matcher(htmlText);
 matcher.matches();  // -> Matches entire text
 ```
 
-|?|The question mark indicates zero or one occurrences of the preceding element. For example, colou?r matches both "color" and "colour".|
-|*|The asterisk indicates zero or more occurrences of the preceding element. For example, ab*c matches "ac", "abc", "abbc", "abbbc", and so on.|
-|+|The plus sign indicates one or more occurrences of the preceding element. For example, ab+c matches "abc", "abbc", "abbbc", and so on, but not "ac".|
-|{n}[18]|The preceding item is matched exactly n times.|
-|{min,}[18]|The preceding item is matched min or more times.|
-|{min,max}[18]|The preceding item is matched at least min times, but not more than max times.|
+
+| ? | The question mark indicates zero or one occurrences of the preceding element. For example, colou?r matches both "color" and "colour". |
+| * | The asterisk indicates zero or more occurrences of the preceding element. For example, ab*c matches "ac", "abc", "abbc", "abbbc", and so on. |
+| + | The plus sign indicates one or more occurrences of the preceding element. For example, ab+c matches "abc", "abbc", "abbbc", and so on, but not "ac". |
+| {n}[18] | The preceding item is matched exactly n times. |
+| {min,}[18] | The preceding item is matched min or more times. |
+| {min,max}[18] | The preceding item is matched at least min times, but not more than max times. |
+
 
 ``` java 
 String h2GroupPattern = "(<h2>.*?</h2>)"; // -> () grouping, .* mean eveything and any occurrence, ? means lazy search
 ```
+
+
+
+## **Debug**
+> Breakpoint stop before line is executed
+> Show execution point -> shortcut to get back to breakpoint
+> Step Over -> Run current execution line and move to next line and stop
+> Step Into -> Step into execution line e.g calling a method will step into the method details.  However it is a 3rd party lib or java official lib, it won't step into method, it assumes that the code is correct and skips to next line
+> Force Step Into -> Force debug to move into method.
+> Smart Step Into (shift+F7) -> Give option of methods to step into
+> Step Out -> If you no longer want to debug a function
+> Drop Frame -> Rewind back one frame, cannot rewind everything - only local var
+> Run to cursor -> Stop where cursor is
+> Resume program -> Resume program as long as there are no other break points
+> From run menu, press view breakpoints -> to view all breakpoints
+
+1. Break point - line not process
+1. Step Into - debugging method
+2. Step Out - will return back to break point but line (1) would have been executed
+
+> Watchers - turns to blue when last statement changed
+
+> Field Watch point - breaks at line everytime variable is going to be updated
+
+> Step Into -> will send to first method i.e addSuffix() in this case
+> Smart Step Into (shift+F7) -> Give option of methods to step into upperAndPrefix or addSuffix.  If upperAndPrefix selected, out course addSuffix will already have been executed
+``` java
+String result = utils.upperAndPrefix(utils.addSuffix(str));
+```
+
+> **Set var on the fly**
+> In Variables pane, find var, right click and select "set value"
+
+
+## **Testing - JUnit**
+> Test methods need to be public and return void
+> Each test methods should be self contained
+> Can have multiple asset in one method but **NOT BEST PRACTICE**
+> assert
+>- assertEquals(expected, actual, delta is the margin of error);
+>- assertNotEquals()
+>- assertTrue(1==1);
+>- assertTrue("Error message" , 1==2);
+>- assertArrayEquals() -> considers two arrays equal when their lengths are the same, and every element in both arrays is the same (and in the same order)
+>- assertNull()
+>- assertNotNull()
+>- assertSame() -> we use this when we want to check whether two instances are the exact same instance.  Remember that assertEquals() methods uses the equal method to test for equality.  The assertSame() method compare the object references
+>- assertNotSame()
+>- assertThat -> compares teh actual value against a matcher (not the Matcher in JDK but a JUnit matcher class).  This is more powerful than the other assert methods, since we can compare the actual value against a range of values.  Note - only availabe in JUnit 4.4
+
+
+> Annotations
+>- @org.junit.Test -> for test methods
+>- @org.junit.Before -> tells JUnit to run this method before the **each** test methods is run e.g if we have 4 test methods, the before method will be run 4 times
+>- @org.junit.BeforeClass -> will run once before all other test methods are run
+>- @org.junit.After -> ells JUnit to run this method after the **each** test
+>- @org.junit.AfterClass -> will run once after all other test methods are run
+>- @org.junit.Test(expected = IllegalArgumentException.class) -> when expecting exception
