@@ -2174,3 +2174,79 @@ public class Main {
     }
 }
 ```
+
+
+## **Regular Expressions**
+``` java
+String alphanumeric = "abcDeeeF12Ghhiiiijkl99z";
+alphanumeric.replaceAll(".","Y");   // -> "." wild card for any character - replace all characters
+
+alphanumeric.replaceAll("^abcDeee", "YYY"); // -> "^" beginning of string replacement only, replacement does not need to match length of replacement.. Ignores midway matching..
+
+String secondString = "abcDeeeF12GhhabcDeeeiiiijkl99z";
+secondString.replaceAll("^abcDeee", "YYY"); // -> "^" beginning of string replacement only, replacement does not need to match length of replacement.. Ignores midway matching..
+
+alphanumeric.matches("^hello"); // -> returns false
+alphanumeric.matches("^abcDeee"); // -> returns false,entire string need to match
+alphanumeric.matches("abcDeeeF12Ghhiiiijkl99z"); // -> returns true, entire string match
+
+alphanumeric.replaceAll("ijkl99z$", "THE END"); // -> "$" end of string
+alphanumeric.replaceAll("[aei]", "X");  // -> "[]" replace all char between [] with "X". Each individual char is evaluated
+alphanumeric.replaceAll("[aei]", "I replaced a letter here"); // -> replacement can be multiple words
+alphanumeric.replaceAll("[aei][Fj]", "X"); // -> repalce any char a,e,i which is followed by F or j; both matching char are replace by one char in this case e.g "eF" to "X"
+```
+
+``` java
+"harry".replaceAll("[Hh]arry", "Harry"); // -> Replace "Harry" or "harry" with "Harry
+
+String newAlphanumeric = "abcDeeeF12Ghhiiiijkl99z";
+newAlphanumeric.replaceAll("[^ej]", "X");  // -> When "^" is inside "[]", it means everything apart from e and j
+newAlphanumeric.replaceAll("[abcdef345678]", "X"); // -> regex is case sensitive "D" is not repalced by "X" on small "d"
+newAlphanumeric.replaceAll("[a-fA-F3-8]", "X"); // -> "-" is used to specify range, not need to use comma between ranges
+newAlphanumeric.replaceAll("(?i)[a-f3-8]", "X"); // -> "(?i)" ignores parantheses 
+newAlphanumeric.replaceAll("[0-9]", "X");  // -> replace all digits with "X"
+newAlphanumeric.replaceAll("\\d", "X");   // -> replace all digits with "X" shortcut
+newAlphanumeric.replaceAll("\\D", "X");   // -> replace all NON digits with "X" shortcut
+
+String hasWhitespace = "I have blanks and\ta tab, and also a newline\n";
+hasWhitespace.replaceAll("\\s", ""); // -> remove all whitespace 
+hasWhitespace.replaceAll("\t", "X"); // -> replace all tabs
+hasWhitespace.replaceAll("\\S", ""); // -> replace all not white space character
+newAlphanumeric.replaceAll("\\w", "X"); // -> replace char from a-z, A-Z, 0-9, including the _ (underscore) character
+hasWhitespace.replaceAll("\\w", "X");
+hasWhitespace.replaceAll("\\b", "X"); // -> word boundaries, before and after words
+```
+
+``` java
+String thirdAlphanumericString = "abcDeeeF12Ghhiiiijkl99z";
+thirdAlphanumericString.replaceAll("^abcDe{3}", "YYY");  // -> {3}, number of preceding character, in this case "e"
+thirdAlphanumericString.replaceAll("^abcDe+", "YYY");    // -> + doesn't care how many values after
+thirdAlphanumericString.replaceAll("^abcDe*", "YYY");    // -> whether it has an e or not replace, part is optional
+thirdAlphanumericString.replaceAll("^abcDe{2,5}", "YYY"); // -> {min, max}, number of e can occur
+thirdAlphanumericString.replaceAll("h+i*j", "Y");   // -> starts with h, doest care how many h after first h, then followed by i or not, followed by j
+```
+> Pattern
+``` java
+StringBuilder htmlText = new StringBuilder("<h1>My Heading</h1>");
+htmlText.append("<h2>Sub-heading</h2>");
+htmlText.append("<p>This is a paragraph about something.</p>");
+htmlText.append("<p>This is another paragraph about something else.</p>");
+htmlText.append("<h2>Summary</h2>");
+htmlText.append("<p>Here is the summary.</p>");
+
+String h2Pattern = ".*<h2>.*"; 
+Pattern pattern = Pattern.compile(h2Pattern);
+Matcher matcher = pattern.matcher(htmlText);
+matcher.matches();  // -> Matches entire text
+```
+
+|?|The question mark indicates zero or one occurrences of the preceding element. For example, colou?r matches both "color" and "colour".|
+|*|The asterisk indicates zero or more occurrences of the preceding element. For example, ab*c matches "ac", "abc", "abbc", "abbbc", and so on.|
+|+|The plus sign indicates one or more occurrences of the preceding element. For example, ab+c matches "abc", "abbc", "abbbc", and so on, but not "ac".|
+|{n}[18]|The preceding item is matched exactly n times.|
+|{min,}[18]|The preceding item is matched min or more times.|
+|{min,max}[18]|The preceding item is matched at least min times, but not more than max times.|
+
+``` java 
+String h2GroupPattern = "(<h2>.*?</h2>)"; // -> () grouping, .* mean eveything and any occurrence, ? means lazy search
+```
