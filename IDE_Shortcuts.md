@@ -21,3 +21,5 @@ Hit alt-enter and choose Add junit.jar to the classpath if cannot locate path
 In Test.java class right click outside method but inside class press "Create TestClasName" to that we have the test run config
 
 
+
+

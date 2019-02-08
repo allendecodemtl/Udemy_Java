@@ -1,5 +1,6 @@
 .idea/
 .DS_Store
+*.iml
 
 ### Java template
 # Compiled class file

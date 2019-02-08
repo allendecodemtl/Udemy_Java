@@ -682,6 +682,10 @@ int[] myIntVariable = {1,2,3,4,5,6};     // Declare and initialise
 System.out.println(myIntVariable[5]);    // Print 6
 ```
 
+``` java
+char[] srcArray = new char[] { 'K', 'E', 'V', 'I', 'N' };
+```
+
 ## **Refrence Types vs Value Types**
 > (Array and Object) vs Primitives
 > Array are reference types (hold an address not the object itself)
@@ -2309,4 +2313,53 @@ String result = utils.upperAndPrefix(utils.addSuffix(str));
 >- @org.junit.BeforeClass -> will run once before all other test methods are run
 >- @org.junit.After -> ells JUnit to run this method after the **each** test
 >- @org.junit.AfterClass -> will run once after all other test methods are run
+> Exceptions New Version
 >- @org.junit.Test(expected = IllegalArgumentException.class) -> when expecting exception
+> Exceptions Old Version
+``` java
+@org.junit.Test
+public void withdraw_notBranch() throws Exception {
+    try {
+        account.withdraw(600.00, false);
+        fail("Should have thrown an IllegalArgumentException");
+    } catch (IllegalArgumentException e){
+        // No body for exception
+    }
+}
+```
+
+> Parameterized Test
+>- add @RunWith(Parameterized.class) on top of class
+>- need to annotate
+>- need to return collection obj
+``` java 
+ @Parameterized.Parameters
+public static Collection<Object[]> testConditions() {
+    return Arrays.asList(new Object[][]{
+            {100.00, true, 1100.00},
+            {200.00, true, 1200.00},
+            {325.14, true, 1325.14},
+            {489.33, true, 1489.33},
+            {1000.00, true, 2000.00}
+    });
+}
+```
+>- need to create constructor
+``` java
+public BankAccountTestParameterized(double amount, boolean branch, double expected) {
+    this.amount = amount;
+    this.branch = branch;
+    this.expected = expected;
+}
+```
+>- in test, use parametized value
+``` java
+@org.junit.Test
+public void deposit() throws Exception {
+    account.deposit(amount, branch);
+    assertEquals(expected, account.getBalance(), .01);
+}
+```
+
+
+## **Database - SQLite**
