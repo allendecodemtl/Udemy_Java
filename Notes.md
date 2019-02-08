@@ -2362,4 +2362,132 @@ public void deposit() throws Exception {
 ```
 
 
+
 ## **Database - SQLite**
+> Using statement but not very efficient
+``` java 
+try(Statement statement = conn.createStatement();
+    ResultSet results = statement.executeQuery(sb.toString())) {
+
+    List<Artist> artists = new ArrayList<>();
+    while(results.next()) {
+        Artist artist = new Artist();
+        artist.setId(results.getInt(INDEX_ARTIST_ID));  // -> passing int for index is faster
+        // artist.setId(results.getInt());  // -> passing string for column name
+        artist.setName(results.getString(COLUMN_ARTIST_ID));   
+        artists.add(artist);
+    }
+
+    return artists;
+
+} catch(SQLException e) {
+    System.out.println("Query failed: " + e.getMessage());
+    return null;`
+}
+``
+
+> Meta data
+``` java
+public void querySongsMetadata() {
+    String sql = "SELECT * FROM " + TABLE_SONGS;
+
+    try (Statement statement = conn.createStatement();
+            ResultSet results = statement.executeQuery(sql)) {
+
+        ResultSetMetaData meta = results.getMetaData();  // -> ResultSetMetaData is an object from inside java.sql.*;
+        int numColumns = meta.getColumnCount();
+        
+        for(int i=1; i<= numColumns; i++) {       // -> Starting at 1 not zero
+            System.out.format("Column %d in the songs table is names %s\n",
+                    i, meta.getColumnName(i));
+        }
+    } catch(SQLException e) {
+        System.out.println("Query failed: " + e.getMessage());
+    }
+}
+```
+
+> SQL Injection
+```
+" or 1=1 or "
+```
+> Returns everything
+``` sql
+select *
+from artist_list
+where title = 'Go Your Own Way' or 1=1 
+```
+
+> Use preparedstatement
+``` java
+public static final String QUERY_VIEW_SONG_INFO_PREP = "SELECT " + COLUMN_ARTIST_NAME + ", " +
+        COLUMN_SONG_ALBUM + ", " + COLUMN_SONG_TRACK + " FROM " + TABLE_ARTIST_SONG_VIEW +
+        " WHERE " + COLUMN_SONG_TITLE + " = ?";
+private PreparedStatement querySongInfoView;
+
+public boolean open() {
+    try {
+        conn = DriverManager.getConnection(CONNECTION_STRING);
+        querySongInfoView = conn.prepareStatement(QUERY_VIEW_SONG_INFO_PREP);
+
+        return true;
+    } catch (SQLException e) {
+        System.out.println("Couldn't connect to database: " + e.getMessage());
+        return false;
+    }
+}
+
+public void close() {
+    try {
+
+        if(querySongInfoView != null) {
+            querySongInfoView.close();
+        }
+
+        if (conn != null) {
+            conn.close();
+        }
+    } catch (SQLException e) {
+        System.out.println("Couldn't close connection: " + e.getMessage());
+    }
+}
+
+public List<SongArtist> querySongInfoView(String title) {
+    try {
+        querySongInfoView.setString(1, title);
+        ResultSet results = querySongInfoView.executeQuery();
+
+        List<SongArtist> songArtists = new ArrayList<>();
+        while (results.next()) {
+            SongArtist songArtist = new SongArtist();
+            songArtist.setArtistName(results.getString(1));
+            songArtist.setAlbumName(results.getString(2));
+            songArtist.setTrack(results.getInt(3));
+            songArtists.add(songArtist);
+        }
+
+        return songArtists;
+
+    } catch (SQLException e) {
+        System.out.println("Query failed: " + e.getMessage());
+        return null;
+    }
+}
+```
+
+> Cannot use placeholder for tables and column names
+> Can be used with insert and delete
+
+
+## **Transactions**
+> JDBC connection class auto commits changes by default, everytim we call execute() to insert, update or delete records, thos changes are saved to the db as soon as the SQL statement completes. Sometimes that's what we want, but often, it's not.
+> It would be nice if when we wnated to accomplish something that requires multiple SQL statements, we could run all the statements as a single unit.  Either all the SQL statements would successfully complete or none of them would.
+> **Transactions** is a squence of SQL statements that are treated as a single logical unit.  If any of the statement fails, the results of any previous statements in the transaction can be rolled back, or just not saved.  It's as if they never happened.
+
+> DB transactions must be ACID-compliant. The must meet the following characteristics:
+>- Atomicity - If a series of SQL statements change the db, then either all the changes are committed, or none of them are
+>- Consistency - Before a transaction begins, the db is in a valid state. When it completes, the db is still in a valid state.
+>- Isolation - Until the changes committed by a transaction are completed, they won't be visible to other connections.  Transactions can't depend on each other
+>- Durability -On the changes performed by a transaction are committed to the db, they're permanent.  If an application then crashes or the db server goes down (in the case of a client/server db like mysql), the changes made by the transaction are still there when the application runs again, or the db comes back up.
+> Essentially transactions ensure the integrity of the data within a db
+
