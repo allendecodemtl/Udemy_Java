@@ -2454,8 +2454,8 @@ public void close() {
 
 public List<SongArtist> querySongInfoView(String title) {
     try {
-        querySongInfoView.setString(1, title);
-        ResultSet results = querySongInfoView.executeQuery();
+        querySongInfoView.setString(1, title);  // Value of first ?
+        ResultSet results = querySongInfoView.executeQuery(); //
 
         List<SongArtist> songArtists = new ArrayList<>();
         while (results.next()) {
@@ -2478,7 +2478,11 @@ public List<SongArtist> querySongInfoView(String title) {
 > Cannot use placeholder for tables and column names
 > Can be used with insert and delete
 
-
+>
+``` java
+insertPreparedstatement.executeUpdate() // -> returns number of rows affected
+insertPreparedstatement.getGeneratedKeys() // -> returns  
+```
 ## **Transactions**
 > JDBC connection class auto commits changes by default, everytim we call execute() to insert, update or delete records, thos changes are saved to the db as soon as the SQL statement completes. Sometimes that's what we want, but often, it's not.
 > It would be nice if when we wnated to accomplish something that requires multiple SQL statements, we could run all the statements as a single unit.  Either all the SQL statements would successfully complete or none of them would.
@@ -2492,4 +2496,56 @@ public List<SongArtist> querySongInfoView(String title) {
 > Essentially transactions ensure the integrity of the data within a db
 
 > We only have to use transactions when we change the data in a database.  We don't need them if we're querying the db, since we're not changing any data. Sqlite uses transaction by default, and auto-commits by default.  In fact, no changes can be made to the database outside a transaction.  When we were working with the contacts db, every time we used UPDATE, INSERT, and DELETE, sqlite was creating transaction, running the statement and then committing the changes.
+
+> sqlite commands are used for transactions:
+>- **BEGIN TRANSACTION** - we use this to manually start a transaction.
+>- **END TRANSACTION** - use this to end a transaction.  Committing changes automatically ends a transaction.  Also, ending a transaction also commits any changes.  In other words, END TRANSACTION and COMMIT are aliases.  We only have to use one when we want to end a transaction and commit the chagnes.
+>- **COMMIT** - we use this to commit the changes made by a transaction.  As mentioned, this ends the transaction, we don't need to also run the END TRANSACTION command.
+>- **ROLLBACK** - this rolls back any uncommitted changes and ends the transaction.  Note that i can only rollback changes that have occured since the last COMMIT or ROLLBACK.
+
+> Note that if we close a connectio before we commit any outstanding changes, the changes are rolled back.
+
+
+``` java
+public void insertSong(String title, String artist, String album, int track) {
+
+    try {
+        conn.setAutoCommit(false);   // -> Turn off auto-commit
+
+        int artistId = insertArtist(artist);
+        int albumId = insertAlbum(album, artistId);
+        insertIntoSongs.setInt(1, track);
+        insertIntoSongs.setString(2, title);
+        insertIntoSongs.setInt(3, albumId);
+        int affectedRows = insertIntoSongs.executeUpdate();
+        if(affectedRows == 1) {
+            conn.commit();     // -> commit transactions if everything is correct
+            System.out.println("Finished");
+        } else {
+            throw new SQLException("The song insert failed");
+        }
+
+    } catch(Exception e) {  // Make sure you catch it
+        System.out.println("Insert song exception: " + e.getMessage());
+        try {
+            System.out.println("Performing rollback");
+            conn.rollback();    // -> roll back 
+        } catch(SQLException e2) {
+            System.out.println("Oh boy! Things are really bad! " + e2.getMessage());
+        }
+    } finally {
+        try {
+            System.out.println("Resetting default commit behavior");
+            conn.setAutoCommit(true);  // -> turn back auto-commit option
+        } catch(SQLException e) {
+            System.out.println("Couldn't reset auto-commit! " + e.getMessage());
+        }
+    }
+ }
+```
+
+## **Exceptions**
+>
+
+
 
