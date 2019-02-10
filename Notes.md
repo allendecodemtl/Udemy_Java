@@ -2545,7 +2545,241 @@ public void insertSong(String title, String artist, String album, int track) {
 ```
 
 ## **Exceptions**
->
+> Strack Trace and Call Stack
+> Use try-catch-finally
+> Old 
+``` java
+public class Example2 {
+    public static void main(String[] args) {
+        int result = divide();
+        System.out.println(result);
+    }
+
+    private static int divide() {
+        int x, y;
+        try {
+            x = getInt();
+            y = getInt();
+            System.out.println("x is " + x + ", y is " + y);
+            return x / y;
+        } catch (NoSuchElementException e) {
+            throw new ArithmeticException("no suitable input");
+        } catch (ArithmeticException e) {
+            throw new ArithmeticException("attempt to divide by zero");
+        }
+    }
+
+    private static int getInt() {
+        Scanner s = new Scanner(System.in);
+        System.out.println("Please enter an integer ");
+        while (true) {
+            try {
+                return s.nextInt();
+            } catch (InputMismatchException e) {
+                // go round again.  Read past the end of line in the input first
+                s.nextLine();
+                System.out.println("Please enter a number using only the digits 0 to 9 ");
+            }
+        }
+    }
+}
+```
+``` java
+public class Example {
+
+    public static void main(String[] args) {
+        try {
+            int result = divide();
+            System.out.println(result);
+        } catch(ArithmeticException | NoSuchElementException e) {
+            System.out.println(e.toString());
+            System.out.println("Unable to perform division, autopilot shutting down");
+        }
+    }
+
+    private static int divide() {
+        int x, y;
+        try {
+        x = getInt();
+        y = getInt();
+        System.out.println("x is " + x + ", y is " + y);
+        return x / y;
+        } catch(NoSuchElementException e) {
+            throw new NoSuchElementException("no suitable input");
+        } catch(ArithmeticException e) {
+            throw new ArithmeticException("attempt to divide by zero");
+        }
+    }
+
+    private static int getInt() {
+        Scanner s = new Scanner(System.in);
+        System.out.println("Please enter an integer ");
+        while(true) {
+            try {
+                return s.nextInt();
+            } catch(InputMismatchException e) {
+                // go round again.  Read past the end of line in the input first
+                s.nextLine();
+                System.out.println("Please enter a number using only the digits 0 to 9 ");
+            }
+        }
+    }
+}
+```
+```
+case 1:
+Please enter an integer 
+5
+Please enter an integer 
+0
+x is 5, y is 0
+java.lang.ArithmeticException: attempt to divide by zero
+Unable to perform division, autopilot shutting down
+
+case 2
+Please enter an integer 
+^D
+java.util.NoSuchElementException: no suitable input
+Unable to perform division, autopilot shutting down
+```
+
+> However no need to catch in divide() method.. We can catch upstream
+``` java
+public static void main(String[] args) {
+    try {
+        int result = divide();
+        System.out.println(result);
+    } catch(ArithmeticException | NoSuchElementException e) {  // or option "|" as from java 7
+        System.out.println(e.toString());
+        System.out.println("Unable to perform division, autopilot shutting down");
+    }
+}
+
+private static int divide() {
+    int x, y;
+    x = getInt();
+    y = getInt();
+    System.out.println("x is " + x + ", y is " + y);
+    return x / y;
+}
+
+private static int getInt() {
+    Scanner s = new Scanner(System.in);
+    System.out.println("Please enter an integer ");
+    while(true) {
+        try {
+            return s.nextInt();
+        } catch(InputMismatchException e) {
+            // go round again.  Read past the end of line in the input first
+            s.nextLine();
+            System.out.println("Please enter a number using only the digits 0 to 9 ");
+        }
+    }
+}
+```
+> Finally
+``` java
+public static void main(String[] args) {
+    FileWriter locFile = null;  // -> Must be declared outside, such that we can access it in finally
+    try {
+        locFile = new FileWriter("locations.txt");
+        ... do more things here
+    } catch(IOException e) {
+        System.out.println("In catch block");
+        e.printStackTrace();
+    } finally {
+        System.out.println("in finally block");
+        try {
+            if(locFile != null) {
+                System.out.println("Attempting to close locfile");
+                locFile.close();
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+> You don't have to catch exceptions thrown from other methods. If you cannot do anything about the exception where the method throwing it is called, you can just let the method propagate the exception up the call stack to the method that called this method. If you do so the method calling the method that throws the exception must also declare to throw the exception
+``` java
+public static void main(String[] args) throws IOException {
+    FileWriter locFile = null;
+    try {
+        locFile = new FileWriter("locations.txt");
+        for(Location location : locations.values()) {
+            locFile.write(location.getLocationID() + "," + location.getDescription() + "\n");
+        }
+    } finally {
+        System.out.println("in finally block");
+        if (locFile != null) {
+            System.out.println("Attempting to close locfile");
+            locFile.close();
+        }
+    }
+}
+```
+``` java
+public static void main(String[] args) {
+    try {
+        int result = divide();
+        System.out.println(result);
+    } catch (ArithmeticException e) {
+        System.out.println(e.toString());
+        System.out.println("Unable to perform division, autopilot shutting down");
+    }
+}
+
+private static int divide() throws ArithmeticException {
+    int x, y;
+    x = 5;
+    y = 0;
+    System.out.println("x is " + x + ", y is " + y);
+    return x / y;
+}
+```
+> Try with Resources
+``` java
+public static void main(String[] args) throws IOException {
+    try(FileWriter locFile = new FileWriter("locations.txt")) {
+        for(Location location : locations.values()) {
+            locFile.write(location.getLocationID() + "," + location.getDescription() + "\n");
+        }
+    }
+}
+```
+> Java 9 Enhancement
+``` java 
+private static void printFile() throws IOException {
+    FileInputStream input = new FileInputStream("file.txt");
+    try(input) {
+        int data = input.read();
+        while(data != -1){
+            System.out.print((char) data);
+            data = input.read();
+        }
+    }
+}
+```
+> Multiple resources
+``` java
+public static void main(String[] args) throws IOException {
+    try(FileWriter locFile = new FileWriter("locations.txt");
+        FileWriter dirFile = new FileWriter("directions.txt")) {
+        for(Location location : locations.values()) {
+            locFile.write(location.getLocationID() + "," + location.getDescription() + "\n");
+            for(String direction : location.getExits().keySet()) {
+                dirFile.write(location.getLocationID() + "," + direction + "," + location.getExits().get(direction) + "\n");
+            }
+        }
+    }
+}
+```
 
 
+> Checked vs unchecked exception
+>- Cannot ignore checked exception
+## **Java IO**
+> 
+``` java
 
+```
