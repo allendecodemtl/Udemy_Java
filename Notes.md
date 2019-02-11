@@ -2762,16 +2762,34 @@ private static void printFile() throws IOException {
 ```
 > Multiple resources
 ``` java
-public static void main(String[] args) throws IOException {
-    try(FileWriter locFile = new FileWriter("locations.txt");
-        FileWriter dirFile = new FileWriter("directions.txt")) {
-        for(Location location : locations.values()) {
-            locFile.write(location.getLocationID() + "," + location.getDescription() + "\n");
-            for(String direction : location.getExits().keySet()) {
-                dirFile.write(location.getLocationID() + "," + direction + "," + location.getExits().get(direction) + "\n");
-            }
-        }
+try(Scanner scanner = new Scanner(new FileReader("locations_big.txt"))) {
+    scanner.useDelimiter(",");
+    while(scanner.hasNextLine()) {
+        int loc = scanner.nextInt();
+        scanner.skip(scanner.delimiter());
+        String description = scanner.nextLine();
+        System.out.println("Imported loc: " + loc + ": " + description);
+        Map<String, Integer> tempExit = new HashMap<>();
+        locations.put(loc, new Location(loc, description, tempExit));
     }
+} catch(IOException e) {
+    e.printStackTrace();
+}
+
+// Now read the exits
+try (BufferedReader dirFile = new BufferedReader(new FileReader("directions_big.txt"))) {
+    String input;
+    while((input = dirFile.readLine()) != null) {
+        String[] data = input.split(",");
+        int loc = Integer.parseInt(data[0]);
+        String direction = data[1];
+        int destination = Integer.parseInt(data[2]);
+        System.out.println(loc + ": " + direction + ": " + destination);
+        Location location = locations.get(loc);
+        location.addExit(direction, destination);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
 }
 ```
 
@@ -2781,5 +2799,271 @@ public static void main(String[] args) throws IOException {
 ## **Java IO**
 > 
 ``` java
-
+try {
+    scanner = new Scanner(new BufferedReader(new FileReader("directions_big.txt")));
+    scanner.useDelimiter(",");
+    while(scanner.hasNextLine()) {
+        String input = scanner.nextLine();
+        String[] data = input.split(",");
+        int loc = Integer.parseInt(data[0]);
+        String direction = data[1];
+        int destination = Integer.parseInt(data[2]);
+        System.out.println(loc + ": " + direction + ": " + destination);
+        Location location = locations.get(loc);
+        location.addExit(direction, destination);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    if(scanner != null) {
+        scanner.close();
+    }
+}
 ```
+
+
+> BufferedWriter
+``` java
+try(BufferedWriter locFile = new BufferedWriter(new FileWriter("locations.txt"));
+    BufferedWriter dirFile = new BufferedWriter(new FileWriter("directions.txt"))) {
+    for(Location location : locations.values()) {
+        locFile.write(location.getLocationID() + "," + location.getDescription() + "\n");
+        for(String direction : location.getExits().keySet()) {
+            if(!direction.equalsIgnoreCase("Q")) {
+                dirFile.write(location.getLocationID() + "," + direction + "," + location.getExits().get(direction) + "\n");
+            }
+        }
+    }
+}
+```
+
+> Byte Streams - read and write in binary type for primitives only
+
+``` java
+try (DataOutputStream locFile = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("locations.dat")))) {   // .dat to specify not text but binary file
+    for (Location location : locations.values()) {
+        locFile.writeInt(location.getLocationID());   // Write int
+        locFile.writeUTF(location.getDescription());  // Write string
+        System.out.println("Writing location " + location.getLocationID() + " : " + location.getDescription());
+        System.out.println("Writing " + (location.getExits().size() - 1) + " exits.");
+        locFile.writeInt(location.getExits().size() - 1);
+        for (String direction : location.getExits().keySet()) {
+            if (!direction.equalsIgnoreCase("Q")) {
+                System.out.println("\t\t" + direction + "," + location.getExits().get(direction));
+                locFile.writeUTF(direction);
+                locFile.writeInt(location.getExits().get(direction));
+            }
+        }
+    }
+}
+```
+``` java
+try(DataInputStream locFile = new DataInputStream(new BufferedInputStream(new FileInputStream("locations.dat")))) {
+    boolean eof = false;
+    while(!eof) {
+        try {
+            Map<String, Integer> exits = new LinkedHashMap<>();
+            int locID = locFile.readInt();
+            String description = locFile.readUTF();
+            int numExits = locFile.readInt();
+            System.out.println("Read location " + locID + " : " + description);
+            System.out.println("Found " + numExits + " exits");
+            for(int i=0; i<numExits; i++) {
+                String direction = locFile.readUTF();
+                int destination = locFile.readInt();
+                exits.put(direction, destination);
+                System.out.println("\t\t" + direction + "," + destination);
+            }
+            locations.put(locID, new Location(locID, description, exits));
+
+        } catch(EOFException e) {
+            eof = true;   // When end of file, it will generate and exception, which we used to exit the loop
+        }
+
+    }
+} catch(IOException io) {
+    System.out.println("IO Exception");
+}
+```
+> Object input/output stream - serialisation
+
+``` java
+public class Location implements Serializable{  // Need to implement Serializable
+    private final int locationID;
+    private final String description;
+    private final Map<String, Integer> exits;   // Need to make sure all object have implemented Serializable.. In this case Map already implements Serializable
+
+    private long serialVersionUID = 1L;         // Usually set to private and long for serialVersionUID
+
+    ... constructor
+    ... getter and setter
+}
+```
+> Write object location directly to file.
+``` java
+try (ObjectOutputStream locFile = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("locations.dat")))) {
+    for(Location location : locations.values()) {
+        locFile.writeObject(location);
+    }
+}
+```
+``` java
+try(ObjectInputStream locFile = new ObjectInputStream(new BufferedInputStream(new FileInputStream("locations.dat")))) {
+    boolean eof = false;
+    while(!eof) {
+        try {
+            Location location = (Location) locFile.readObject();  // Return and object .. Casting required
+            System.out.println("Read location " + location.getLocationID() + " : " + location.getDescription());
+            System.out.println("Found " + location.getExits().size() + " exits");
+
+            locations.put(location.getLocationID(), location);
+        } catch(EOFException e) {
+            eof = true;
+        }
+    }
+} catch(IOException io) {
+    System.out.println("IO Exception" + io.getMessage());
+} catch(ClassNotFoundException e) {
+    System.out.println("ClassNotFoundException " + e.getMessage());
+}
+```
+
+> If serialVersionUID is not match, JVM will throw an "InvalidClassException"
+> If two var points to the same object - only one object will be serialized.
+> One object per file.  If we have two files.. then will have a copy of the object in two files.
+
+> **RandomAccessFile Class**
+> 
+``` java
+```
+
+
+> **Java NIO**
+> In java 1.4, a new I/O package was added to the java sdk
+> Called java.nio, the package was described as an improvement to the Java I/O because the classes in the package perform I/O in a non-blocking manner.  java.nio was also meant to fix some of the problems developers could run into when using the java.io classes to work with the file system
+> The java.nio classes fall into one of two buckets:  those that deal with the file system, and those that deal with reading and writing data.  In this video, we'll start looking at the classes that read data from, and write data to, a a datasource.
+> When using classes in the java.io package, athread will block while it's waiting to read or write to a stream or buffer.
+> However, threads using the java.nio classes will not block.  They are free to continuer executing, so java.nio was introduced as a performance improvement.
+> However, many developers have urgued that the java.nio package was a step backwards.  Some have shown that blocking I/O is often faster than non-blocking I/O
+> Previously, you learned that the java.io classes work with streams(character and binary).  Data is read one byte or character at a time and sometimes buffered, depending on which classes are used.  When using java.nio, you'll deal with data in blocks, and rather than processing one byte or character at a time, one block will be processed at a time.  To accomplish this, you'll use channels and buffers.
+``` java
+public static void main(String[] args) throws IOException {
+    Path locPath = FileSystems.getDefault().getPath("locations_big.txt");
+    Path dirPath = FileSystems.getDefault().getPath("directions_big.txt");
+    try (BufferedWriter locFile = Files.newBufferedWriter(locPath);  // Use newBUfferedWriter from NIO and passing a Path obj
+            BufferedWriter dirFile = Files.newBufferedWriter(dirPath)) {
+
+        for(Location location: locations.values()) {
+            locFile.write(location.getLocationID() + "," + location.getDescription() + "\n");
+            for(String direction : location.getExits().keySet()) {
+                if(!direction.equalsIgnoreCase("Q")) {
+                    dirFile.write(location.getLocationID() + "," + direction + " ," +
+                        location.getExits().get(direction) + "\n");
+                }
+            }
+        }
+
+    } catch(IOException e) {
+        System.out.println("IOException: " + e.getMessage());
+    }
+}
+
+static {
+    Path locPath = FileSystems.getDefault().getPath("locations_big.txt");
+    Path dirPath = FileSystems.getDefault().getPath("directions_big.txt");
+
+    try (Scanner scanner = new Scanner(Files.newBufferedReader(locPath))) { // Use newBufferedReader from NIO and passing a Path obj
+        scanner.useDelimiter(",");
+        while(scanner.hasNextLine()) {
+            int loc = scanner.nextInt();
+            scanner.skip(scanner.delimiter());
+            String description = scanner.nextLine();
+            System.out.println("Imported loc: " + loc + ": " + description);
+            locations.put(loc, new Location(loc, description, null));
+        }
+    } catch(IOException e) {
+        e.printStackTrace();
+    }
+}
+```
+``` java
+try (BufferedReader dirFile = Files.newBufferedReader(dirPath)) {
+    String input;
+
+    while ((input = dirFile.readLine()) != null) {
+        String[] data = input.split(",");
+        int loc = Integer.parseInt(data[0]);
+        String direction = data[1];
+        int destination = Integer.parseInt(data[2]);
+        System.out.println(loc + ": " + direction + ": " + destination);
+        Location location = locations.get(loc);
+        location.addExit(direction, destination);
+    }
+
+} catch (IOException e) {
+    e.printStackTrace();
+
+}
+```
+
+> Serialising Object with NIO
+``` java
+Path locPath = FileSystems.getDefault().getPath("locations.dat");
+try (ObjectOutputStream locFile = new ObjectOutputStream(new BufferedOutputStream(Files.newOutputStream(locPath)))) {
+    for(Location location : locations.values()) {
+        locFile.writeObject(location);
+    }
+}
+```
+``` java
+Path locPath = FileSystems.getDefault().getPath("locations.dat");
+try (ObjectInputStream locFile = new ObjectInputStream(new BufferedInputStream(Files.newInputStream(locPath)))) {
+    boolean eof = false;
+    while(!eof) {
+        try {
+            Location location = (Location) locFile.readObject();
+            locations.put(location.getLocationID(), location);
+        } catch(EOFException e) {
+            eof = true;
+        }
+    }
+} catch(InvalidClassException e) {
+    System.out.println("InvalidClassException " + e.getMessage());
+} catch(IOException e) {
+    System.out.println("IOException " + e.getMessage());
+} catch(ClassNotFoundException e) {
+    System.out.println("ClassNotFoundException " + e.getMessage());
+}
+```
+
+> Reading and Writing txt files using NIO only
+>- Channel - datasource you write from or to
+>- Buffers - container for block of data you want to read or write
+>- Selectors - allow single thread to manage the I/O for multiple channels
+``` java
+ try {
+    Path dataPath = FileSystems.getDefault().getPath("data.txt");
+    Files.write(dataPath, "\nLine 5".getBytes("UTF-8"), StandardOpenOption.APPEND);  // -> write to file; also reading bytes; appending here, can change param for other;
+    List<String> lines = Files.readAllLines(dataPath); // -> read file
+    for(String line : lines) {
+        System.out.println(line);
+    }
+
+} catch(IOException e) {
+    e.printStackTrace();
+}
+```
+
+## **java.nio.file**
+> Used to work with the file system
+> Paths applies to files and directories
+> Paths can refer to either to a file of a directory
+``` java
+Path path = FileSystems.getDefault().getPath("WorkingDirectoryFile.txt");  // Starting at intellij path directory
+Path filePath = FileSystems.getDefault().getPath("files", "SubdirectoryFile.txt");  // Accessing subdirectories file
+Path filePath2 = FileSystems.getDefault().getPath("./files/SubdirectoryFile.txt");  // Single string
+Path filePath3 = Paths.get(".","files", "SubdirectoryFile.txt");
+Path filePath3 = Paths.get("/Volumes/Production/Courses/Programs/JavaPrograms/OutThere.txt");
+```
+
+> Java IO has problems with paths, Java NIO solves those problems
