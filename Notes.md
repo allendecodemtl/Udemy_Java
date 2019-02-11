@@ -3066,4 +3066,323 @@ Path filePath3 = Paths.get(".","files", "SubdirectoryFile.txt");
 Path filePath3 = Paths.get("/Volumes/Production/Courses/Programs/JavaPrograms/OutThere.txt");
 ```
 
+> Creating path do not check if directory or file exist
+
 > Java IO has problems with paths, Java NIO solves those problems
+
+> Check if path exist
+> Files.exists takes other parameter
+``` java
+Path filePath = FileSystems.getDefault().getPath("files");
+System.out.println("Exists = " + Files.exists(filePath));
+```
+
+> Copy files
+``` java
+Path sourceFile = FileSystems.getDefault().getPath("Examples", "file1.txt");
+Path copyFile = FileSystems.getDefault().getPath("Examples", "file1copy.txt");
+Files.copy(sourceFile, copyFile);
+Files.copy(sourceFile, copyFile, StandardCopyOption.REPLACE_EXISTING);  // -> Can pass 3 params
+```
+
+> Copy dir - will only copy dir but not the contents
+``` java
+sourceFile = FileSystems.getDefault().getPath("Examples", "Dir1");
+copyFile = FileSystems.getDefault().getPath("Examples", "Dir4");
+Files.copy(sourceFile, copyFile, StandardCopyOption.REPLACE_EXISTING);
+```
+
+> Move file
+``` java
+Path fileToMove = FileSystems.getDefault().getPath("Examples", "file1.txt");
+Path destination = FileSystems.getDefault().getPath("Examples", "Dir1" ,"file1.txt");
+Files.move(fileToMove, destination);
+```
+
+> Rename file - using move like in linux
+``` java
+Path fileToMove = FileSystems.getDefault().getPath("Examples", "file1.txt");
+Path destination = FileSystems.getDefault().getPath("Examples", "file2.txt");
+Files.move(fileToMove, destination);
+```
+
+> Delete
+``` java
+Path fileToDelete = FileSystems.getDefault().getPath("Examples", "Dir1", "file1copy.txt");
+Files.deleteIfExists(fileToDelete);
+```
+
+> Creating files
+``` java
+Path fileToCreate = FileSystems.getDefault().getPath("Examples", "file2.txt");
+Files.createFile(fileToCreate);
+```
+
+> Create Directory
+``` java
+Path dirToCreate2 = FileSystems.getDefault().getPath("Examples", "Dir2/Dir3/Dir4/Dir5/Dir6");
+Files.createDirectory(dirToCreate2);
+```
+
+> File and Directory meta data / attributes
+``` java
+Path filePath = FileSystems.getDefault().getPath("Examples", "Dir1\\file1.txt").toAbsolutePath();
+System.out.println(filePath);
+long size = Files.size(filePath);
+System.out.println("Size = " + size);
+System.out.println("Last modified =  " + Files.getLastModifiedTime(filePath));
+```
+
+``` java
+Path filePath = FileSystems.getDefault().getPath("Examples", "Dir1\\file1.txt").toAbsolutePath();
+System.out.println(filePath);
+long size = Files.size(filePath);
+System.out.println("Size = " + size);
+System.out.println("Last modified =  " + Files.getLastModifiedTime(filePath));
+```
+
+> ls directory
+``` java
+Path directory = FileSystems.getDefault().getPath("FileTree\\Dir2");  
+try (DirectoryStream<Path> contents = Files.newDirectoryStream(directory)) {
+    for (Path file : contents) {
+        System.out.println(file.getFileName());
+    }
+
+} catch (IOException | DirectoryIteratorException e) {
+    System.out.println(e.getMessage());
+}
+```
+> Passing filter by using glob pattern
+> * character matches any string (which can contain any number of characters)
+>- *.dat -> will match any path with the .dat extension
+>- *.{dat,txt} -> will match any path that has the extensions .dat or .txt
+> ? matches exactly one character e.g the glob ??? would match any path that contains exactly three characters
+>- myfile* -> matches any paths that begin with myfile
+>- b?*.txt -> matches any paths that are at least two characters long and beging with the character b (the ? forces a second character, and the * matches 0 or more characters
+https://docs.oracle.com/javase/8/docs/api/java/nio/file/FileSystem.html#getPathMatcher-java.lang.String-
+
+``` java
+Path directory = FileSystems.getDefault().getPath("FileTree\\Dir2");  
+try (DirectoryStream<Path> contents = Files.newDirectoryStream(directory)) {
+    for (Path file : contents) {
+        System.out.println(file.getFileName());
+    }
+
+} catch (IOException | DirectoryIteratorException e) {
+    System.out.println(e.getMessage());
+}
+```
+
+> Print only files 
+``` java
+// Implementing interface on the fly
+DirectoryStream.Filter<Path> filter = new DirectoryStream.Filter<Path>() {
+            public boolean accept(Path path) throws IOException {
+                return (Files.isRegularFile(path));
+            }
+        };
+
+// Lambda version
+DirectoryStream.Filter<Path> filter = p -> Files.isRegularFile(p);
+```
+``` java
+Path directory = FileSystems.getDefault().getPath("FileTree\\Dir2");  
+try (DirectoryStream<Path> contents = Files.newDirectoryStream(directory, filter)) {  // -> Passsing filter
+    for (Path file : contents) {
+        System.out.println(file.getFileName());
+    }
+
+} catch (IOException | DirectoryIteratorException e) {
+    System.out.println(e.getMessage());
+}
+```
+
+> File seperator
+> Two ways to get sysetem separator
+``` java
+String separator = File.separator;
+System.out.println(separator);
+
+separator = FileSystems.getDefault().getSeparator();
+System.out.println(separator);
+```
+
+
+> Temp files
+``` java
+try {
+    Path tempFile = Files.createTempFile("myapp", ".appext");  // C:\Users\???\AppData\Local\Temp\myapp1797805585146820741.appext
+    System.out.println("Temporary file path = " + tempFile.toAbsolutePath());
+
+} catch(IOException e) {
+    System.out.println(e.getMessage());
+}
+```
+
+> File stores - mounted system for linux or drive for windows
+``` java
+Iterable<FileStore> stores = FileSystems.getDefault().getFileStores();
+for(FileStore store : stores) {
+    System.out.println("Volume name/Drive letter = " + store);
+    System.out.println("file store = " + store.name());
+}
+
+System.out.println("*******************");
+Iterable<Path> rootPaths = FileSystems.getDefault().getRootDirectories();
+for(Path path : rootPaths) {
+    System.out.println(path);
+}
+```
+
+> **Walk file tree**
+> Cannot make assumption in the sequence the files/dirs are visited
+> We'll have to use the FileVisitor interface.  Using the moethods in the FileVisitor, you can run code at each stage of the traversal process.  Here are the methods, you'll have to implement
+>- **preVisitDirectory()** - this method accepts a reference to the directory, and the BasicFileAttributes instance for the directory.  It's called before entries in the directory are visited.
+>- **postVisitDirectory()** - this method accepts a reference to the directory, an exception object (when necessary).  It's called after entries in the directory, and all its desecendants, have been visited.  The exception parameter will be set when an exception happens during the traversal of the entries and descendants
+>- There's a way to skip files as you're traversing, so not every file has to have been visited for this method to be called.  Every file has to be visited or explicitly skipped.  Of course, if an exception is thrown and not handled, the traversal will prematurely end and postVisitDirectory() will be called.
+>- **visitFile()** - this method accepts a reference to the file and a BasicFileAttributes instance.  This is where you run the code that will operate on the file.  It's only called for files.
+>- **visitFileFailed()** - this method is called when a files can't be accessed.  The exception that's thrown is passed to the method.  You can then decide what to do with it (throw it, print it, or anything else that makes sense for the application and operation being performed).  Can be called for files and directories.
+``` java
+System.out.println("---Walking Tree for Dir2---");
+Path dir2Path = FileSystems.getDefault().getPath("FileTree" + File.separator + "Dir2");
+try {
+    Files.walkFileTree(dir2Path, new PrintNames());
+} catch(IOException e) {
+    System.out.println(e.getMessage());
+}
+```
+``` java
+public class PrintNames extends SimpleFileVisitor<Path> {
+    @Override
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        System.out.println(file.toAbsolutePath());
+        return FileVisitResult.CONTINUE;
+    }
+
+    @Override
+    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+        System.out.println(dir.toAbsolutePath());
+        return FileVisitResult.CONTINUE;
+    }
+
+    @Override
+    public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        System.out.println("Error accessing file: " + file.toAbsolutePath() + " " + exc.getMessage());
+        return FileVisitResult.CONTINUE;
+    }
+}
+```
+
+> Relativized and Resolve
+``` java
+Path sourcePath = FileSystems.getDefault().getPath("FileTree" + File.separator + "Dir2"+ File.separator + "Dir3"+ File.separator + "file1.txt");
+Path sourceRoot = FileSystems.getDefault().getPath("FileTree" + File.separator + "Dir2");
+Path targetRoot = FileSystems.getDefault().getPath("FileTree" + File.separator + "Dir4"+ File.separator + "Dir2Copy");
+
+Path relativizedPath = sourceRoot.relativize(sourcePath);
+System.out.println(relativizedPath);
+Path resolvedPathForCopy = targetRoot.resolve(relativizedPath);
+System.out.println(resolvedPathForCopy);
+```
+
+> Copy subdirectories
+``` java
+public static void main(String[] args) {
+    System.out.println("---Copy Dir2 to Dir4/Dir2Copy---");
+    Path dir2Path = FileSystems.getDefault().getPath("FileTree" + File.separator + "Dir2");
+    Path copyPath = FileSystems.getDefault().getPath("FileTree" + File.separator + "Dir4" + File.separator + "Dir2Copy");
+    //    FileTree/Dir4/Dir2Copy
+    try {
+        Files.walkFileTree(dir2Path, new CopyFiles(dir2Path, copyPath));
+    } catch(IOException e) {
+        System.out.println(e.getMessage());
+    }
+}
+```
+
+``` java
+public class CopyFiles extends SimpleFileVisitor<Path> {
+    private Path sourceRoot;
+    private Path targetRoot;
+
+    public CopyFiles(Path sourceRoot, Path targetRoot) {
+        this.sourceRoot = sourceRoot;
+        this.targetRoot = targetRoot;
+    }
+
+    @Override
+    public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        System.out.println("Error accessing file: " + file.toAbsolutePath() + " " + exc.getMessage());
+        return FileVisitResult.CONTINUE;
+    }
+
+    @Override
+    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+
+        Path relativizedPath = sourceRoot.relativize(dir);
+        System.out.println("RelativizedPath = " + relativizedPath);
+        Path copyDir = targetRoot.resolve(relativizedPath);
+        System.out.println("Resolved path for copy = " + copyDir);
+
+        try {
+            Files.copy(dir, copyDir);
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+            return FileVisitResult.SKIP_SUBTREE;
+        }
+
+        return FileVisitResult.CONTINUE;
+    }
+
+    @Override
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        Path relativizedPath = sourceRoot.relativize(file);
+        System.out.println("RelativizedPath = " + relativizedPath);
+        Path copyDir = targetRoot.resolve(relativizedPath);
+        System.out.println("Resolved path for copy = " + copyDir);
+
+        try {
+            Files.copy(file, copyDir);
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return FileVisitResult.CONTINUE;
+    }
+}
+```
+
+> IO equivalent
+``` java
+File file = new File("/Examples/file.txt");   // C:\\Examples\file.txt
+Path convertedPath = file.toPath();
+System.out.println("convertedPath = " + convertedPath);
+
+File parent = new File("/Examples");  // C:\\Examples
+File resolvedFile = new File(parent, "dir/file.txt");  // dir\\file.txt
+System.out.println(resolvedFile.toPath());
+
+resolvedFile = new File("/Examples", "dir/file.txt");  // C:\\Examples   dir\\file.txt
+System.out.println(resolvedFile.toPath());
+
+Path parentPath = Paths.get("/Examples");  // C:\\Examples
+Path childRelativePath = Paths.get("dir/file.txt");  // dir\\file.txt
+System.out.println(parentPath.resolve(childRelativePath));
+
+File workingDirectory = new File("").getAbsoluteFile();
+System.out.println("Working directory = " + workingDirectory.getAbsolutePath());
+
+System.out.println("--- print Dir2 contents using list() ---");
+File dir2File = new File(workingDirectory, "/FileTree/Dir2");   // \\FileTree\Dir2
+String[] dir2Contents = dir2File.list();
+for(int i=0; i< dir2Contents.length; i++) {
+    System.out.println("i= " + i + ": " + dir2Contents[i]);
+}
+
+System.out.println("--- print Dir2 contents using listFiles() ---");
+File[] dir2Files = dir2File.listFiles();
+for(int i=0; i< dir2Files.length; i++) {
+    System.out.println("i= " + i + ": " + dir2Files[i].getName());
+}
+```
