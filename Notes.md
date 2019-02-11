@@ -3386,3 +3386,7 @@ for(int i=0; i< dir2Files.length; i++) {
     System.out.println("i= " + i + ": " + dir2Files[i].getName());
 }
 ```
+
+## **Sumamry java.io vs java.nio**
+> use **java.nio** for working with file system
+> use **java.io** for reading and writing file contents - often better choice
