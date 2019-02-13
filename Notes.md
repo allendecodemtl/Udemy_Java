@@ -3542,3 +3542,869 @@ for(int i=0; i< dir2Files.length; i++) {
 ## **Sumamry java.io vs java.nio**
 > use **java.nio** for working with file system
 > use **java.io** for reading and writing file contents - often better choice
+
+
+## **Concurrency/Threads**
+> A **process** is a unit of execution that has its own memory space.  Each instance of a JVM runs as a process (this isn't true for all JVM inplementations, but for most of them).  When we run a Java console application, we're kicking off a process.  When we run a JavaFX application, we're kicking off a process.
+
+> If one Java application is running and we run another one, each application has its own memory space of heap.  the first Java application can't access the heap that belongs to the second Java application.  The heap isn't shared between them.  They each have their own.
+
+> A thread is a unit of execution within a process.  Each process can have multiple threads.  In Java, every process (or application) has at least one thread, the main thread (for UI applications, this is called the JavaFX application thread).  In fact just about every Java process also has multiple system threads that handle tasks like memory management and I/O.  We, the developers, don't explicitly create and code those threads.  Our code runs on the main thread, or in other threads that we explicitly create.
+
+> Creating a thread doesn't require as many resources as creating a process.  Every thread created by a process shares the process's memory and files.  This can create problems.
+
+> In addition to the process's memory, or heap, each thread has what's called a thread stack, which is the memory that only that thread can access. 
+
+> So, every Java app runs as a single process, and each process can have multiple threads.  Every process has a heap, and every thread has a thread stack.
+
+Reasons for threading:
+> We sometimes want to perform a task that's going to take a long time.  e.g, we might want to query a db or we might want to fetch data from somewhere on the Internet.  We could do this on the main thread, but the code within each main thread executes in a linear fashion.  The main thread won't be able to do anything else while it's waiting for the data.
+
+> Another way of putting this is that the execution of the main thread will be suspended.  It has to wait for the data to be returned before it can execute the next line of code.  To the user, this could appear as if our applications has died or is frozen, expecially when we're dealing with a UI application.
+
+> Instead of tying up the main thread, we can create another thread and execute the long-running task on that thread.  This would free up the main thead, so that it can continue executing.  In can report progress or accept user input while the long-running task continues to execute in the background.
+
+> A second reason we might want to use threads is because an API requires us to provide one.  Sometimes we have to provide the code taht will run when a method we've called reaches a certain point in it's execution.  In this instance, we usually don't create the thread.  We pass in the code that we want to run on the thread.
+
+> Concurrency, which refers to an application doing more than one thing at a time.  Now, that doesn't necessarily mean that the application ins doing more than one thing at the same time.  It means that progress can be made on more than one task.  Let's say that an application wants to download data and draw a sharpe on the screen.
+
+>  If it's a concurrent application, it can download a bit of data, then switch to drawing part of the shape, then switch back to downloading some more data, then swith back to drawing more of the shape, etc.
+> Concurrency means that one task doesn't have to complete before another can start.  Java provides thread-related classes so that we can create Java concurrent applications.
+
+> Working with threads, we're at the mercy of the JVM and the os when it comes to when threads are scheduled to run
+
+**Starting threads**
+> Extending Thread class
+>* Class extends Threads
+``` java
+Thread anotherThread = new AnotherThread();
+anotherThread.start();
+```
+>* extending anonymous class
+``` java
+new Thread() {
+    @Override
+    public void run() {
+        System.out.println("Hello form the anonymous class thread");
+    }
+}.start();
+```
+
+> Implementing Runnable interface 
+>* Class implement Runnalbe and pass instance to the Thread class.
+``` java
+Thread myRunnableThread = new Thread(new MyRunnable()); myRunnableThread.start();
+```
+>* implementing anonymous interface
+``` java
+Thread myRunnableThread2 = new Thread(new MyRunnable() {
+    @Override
+    public void run() {
+        System.out.println(ANSI_RED + "Hello from the anonymous class's implementation of run()");
+    }
+});
+myRunnableThread2.start();
+``` 
+
+> Runnable vs subclass
+>* Runnable used more often as it is more flexible.
+
+> start() vs run()
+``` java
+public class AnotherThread extends  Thread{
+    @Override
+    public void run() {
+        System.out.println(ANSI_BLUE +"Hello from " + currentThread().getName());
+    }
+}
+```
+>* start()
+>* when program calls start() method a new Thread is created and code inside run() method is executed in new Thread
+``` java
+Thread anotherThread = new AnotherThread();
+anotherThread.setName("== Another Thread ==");
+anotherThread.run(); // prints -> Hello from == Another Thread ==
+```
+>* run()
+>* if you call run() method directly no new Thread is created and code inside run() will execute on current Thread
+``` java
+Thread anotherThread = new AnotherThread();
+anotherThread.setName("== Another Thread ==");
+anotherThread.run(); // prints -> Hello from main
+```
+
+> Thread.sleep();
+``` java
+try{
+    Thread.sleep(3000);
+} catch (InterruptedException e){
+    System.out.println(ANSI_BLUE+"Another thread woke me up");
+}
+```
+
+> Thread.interrupt();
+``` java
+psvm -> {
+    Thread anotherThread = new AnotherThread();
+    anotherThread.setName("== Another Thread ==");
+    anotherThread.start();
+    anotherThread.interrupt(); // main thread by calling interrupt, will trigger the InterruptedException exception catch clause
+}
+
+AnotherThread class 
+try{
+    Thread.sleep(3000);
+} catch (InterruptedException e){
+    System.out.println(ANSI_BLUE+"Another thread woke me up");
+    return; // -> Terminates thread
+}
+```
+
+> Thread.join();
+``` java
+Thread myRunnableThread = new Thread(new MyRunnable() {
+    @Override
+    public void run() {
+        System.out.println(ANSI_RED + "Hello from the anonymous class's implementation of run()");
+        try {
+            anotherThread.join();  // Waits for anotherThred to finish and then continue
+            System.out.println(ANSI_RED + "AnotherThread terminated, or timed out, so I'm running again");
+        } catch(InterruptedException e) {
+            System.out.println(ANSI_RED + "I couldn't wait after all. I was interrupted");
+        }
+    }
+});
+```
+> Thread.join(2000) -> timeout after 2 seconds and will trigger the InterruptedException of the thread.
+``` java
+Thread myRunnableThread = new Thread(new MyRunnable() {
+    @Override
+    public void run() {
+        System.out.println(ANSI_RED + "Hello from the anonymous class's implementation of run()");
+        try {
+            anotherThread.join(2000);
+            System.out.println(ANSI_RED + "AnotherThread terminated, or timed out, so I'm running again");
+        } catch(InterruptedException e) {
+            System.out.println(ANSI_RED + "I couldn't wait after all. I was interrupted");
+        }
+    }
+});
+
+public class AnotherThread extends  Thread{
+    @Override
+    public void run() {
+        System.out.println(ANSI_BLUE +"Hello from " + currentThread().getName());
+
+        try{
+            Thread.sleep(5000);
+        } catch (InterruptedException e){
+            System.out.println(ANSI_BLUE+"Another thread woke me up");
+            return;
+        }
+        System.out.println(ANSI_BLUE+ "Three seconds have passed and I'm awake");
+    }
+}
+```
+> Prints
+```
+Hello from the anonymous class's implementation of run()
+Hello from == Another Thread ==
+Another thread woke me up
+AnotherThread terminated, or timed out, so I'm running again
+```
+
+> Cannot force thread to run in a priority order (os dependent) even though we can use set priority methods
+
+
+**Heap vs Thread Stack**
+> local variable is tored in the thread stack
+> instance variable is stored in the heap - thread share the same obj
+
+> thread interference or race conditions
+``` java
+public class Main {
+    public static void main(String[] args) {
+        CountDown countDown = new CountDown();
+
+        CountDownThread t1 = new CountDownThread(countDown); // -> sharing the same obj countDown
+        t1.setName("Thread 1");
+        CountDownThread t2 = new CountDownThread(countDown); // -> sharing the same obj countDown
+        t2.setName("Thread 2");
+
+        t1.start();
+        t2.start();
+    }
+}
+
+class CountDown{
+
+    private int i; // -> instance variable shared by "Thread 1" and "Thread 2"
+
+    public void doCountDown(){
+        String color;
+
+        switch (Thread.currentThread().getName()) {
+            case "Thread 1":
+                color = ThreadColor.ANSI_CYAN;
+                break;
+            case "Thread 2":
+                color = ThreadColor.ANSI_PURPLE;
+                break;
+            default:
+                color = ThreadColor.ANSI_GREEN;
+        }
+
+        for(i=10; i>0; i--){
+            System.out.println(color + Thread.currentThread().getName() + " i = " + i);
+        }
+    }
+}
+
+
+class CountDownThread extends Thread{
+    private CountDown threadCountDown;
+
+    public CountDownThread(CountDown countDown){
+        threadCountDown = countDown;
+    }
+
+    @Override
+    public void run() {
+        threadCountDown.doCountDown();
+    }
+}
+```
+
+```
+Thread 2 i = 10
+Thread 2 i = 9
+Thread 2 i = 8
+Thread 2 i = 7
+Thread 2 i = 6
+Thread 2 i = 5
+Thread 2 i = 4
+Thread 1 i = 10
+Thread 2 i = 3
+Thread 1 i = 2
+Thread 2 i = 1
+```
+
+> Synchronisation 
+>* block statements (lock) and methods
+``` java
+public synchronized void doCountDown(){
+    String color;
+
+    switch (Thread.currentThread().getName()) {
+        case "Thread 1":
+            color = ThreadColor.ANSI_CYAN;
+            break;
+        case "Thread 2":
+            color = ThreadColor.ANSI_PURPLE;
+            break;
+        default:
+            color = ThreadColor.ANSI_GREEN;
+    }
+
+    
+    for(i=10; i>0; i--){
+        System.out.println(color + Thread.currentThread().getName() + " i = " + i);
+    }
+}
+```
+>* block statements 
+>* - primitve types don't have locks 
+>* - shouldn't sync on local var - because local var reference are stored in the thread stack but the value is stored in the heap.  Essentialy the thread stack only containt primitive values, object references and function references. Each thread creates its own copy of the local var.  Each copy has it's own lock. Should use a shared object, such that each thread are competing for the lock.
+>* - But String as a local var can be used though - because string obj are re-used in the JVM pool.
+>* - Can sync static methods and static objects
+``` java
+class CountDown{
+
+    private int i;
+
+    public void doCountDown(){
+        String color;
+
+        switch (Thread.currentThread().getName()) {
+            case "Thread 1":
+                color = ThreadColor.ANSI_CYAN;
+                break;
+            case "Thread 2":
+                color = ThreadColor.ANSI_PURPLE;
+                break;
+            default:
+                color = ThreadColor.ANSI_GREEN;
+        }
+
+        synchronized (this){  // -> sync on current instance
+            for(i=10; i>0; i--){
+                System.out.println(color + Thread.currentThread().getName() + " i = " + i);
+            }
+        }
+    }
+}
+```
+
+>* - critical section used - referencing code that is referencing shared resource.
+>* - class or method is threadsafe - developer has synchronised all the critical section of the code so that we don't need to bother about thread interference
+>* - best practice to synchronised the required components not the whole methods.
+
+## **Consumer / Producer Method**
+> Only one synchronised method in a class can run at a time.
+> Putting synchronized on an instance method means that the thread has to acquire the lock (the "intrinsic lock") on the object instance that the method is called on before the thread can start executing any code in that method.
+> wait() -> should be put inside loops
+> notifyAll() -> 
+> Atomic operations (thread cannot be suspended when processing thoses)
+>* reading and writing reference variables
+>* reading and writing primitive variables except of type long and double
+>* reading and writing variable that are declared volatile
+
+``` java 
+import static L_06_JavaUtilConcurrentPackage.Main.EOF;
+
+public class Main {
+    public static final String EOF = "EOF";
+
+    public static void main(String[] args) {
+        List<String> buffer = new ArrayList<String>();
+        MyProducer producer = new MyProducer(buffer, ThreadColor.ANSI_YELLOW);
+        MyConsumer consumer1 = new MyConsumer(buffer, ThreadColor.ANSI_PURPLE);
+        MyConsumer consumer2 = new MyConsumer(buffer, ThreadColor.ANSI_CYAN);
+
+        new Thread(producer).start();
+        new Thread(consumer1).start();
+        new Thread(consumer2).start();
+    }
+}
+
+class MyProducer implements  Runnable {
+    private List<String> buffer;
+    private String color;
+
+    public MyProducer(List<String> buffer, String color) {
+        this.buffer = buffer;
+        this.color = color;
+    }
+
+    public void run() {
+        Random random = new Random();
+        String[] nums = { "1", "2", "3", "4", "5"};
+
+        for(String num: nums) {
+            try {
+                System.out.println(color + "Adding..." + num);
+                synchronized (buffer) { // -> sync
+                    buffer.add(num);
+                }
+                Thread.sleep(random.nextInt(1000));
+            } catch(InterruptedException e) {
+                System.out.println("Producer was interrupted");
+            }
+        }
+
+        System.out.println(color + "Adding EOF and exiting....");
+        synchronized (buffer){ // -> sync
+            buffer.add("EOF");
+        }
+    }
+}
+
+class MyConsumer implements Runnable {
+    private List<String> buffer;
+    private String color;
+
+    public MyConsumer(List<String> buffer, String color) {
+        this.buffer = buffer;
+        this.color = color;
+    }
+
+    public void run() {
+        while(true) {
+            synchronized (buffer){ // -> sync block
+                if(buffer.isEmpty()) {
+                    continue;
+                }
+                if(buffer.get(0).equals(EOF)) {
+                    System.out.println(color + "Exiting");
+                    break;
+                } else {
+                    System.out.println(color + "Removed " + buffer.remove(0));
+                }
+            }
+        }
+    }
+}
+```
+
+
+## **Java util in concurrent package**
+> Arraylist isn't thread safe
+> **Drawback of synchronised blocks**
+>* Threads that are block and waiting to execute synchronise code can't be interrupted.  Once, they're blocked the are stuck there until thet get the lock for the object the code is synchronising on.
+>* Synchronised block must be within the same method in other words, we can't start start block in a method and end sync block in another method.
+>* We can't test to see if an object's intrinsic lock is available or find out any other information about the lock
+>* Also if the lock isn't available we can't timeout after we waited for the lock for a while when we reach the beginning of a synchronised block.  We can either get the lock and continued executing or block at that line of code until we get the lock
+>* If multiple threads are waiting to get a lock, it is not first come first served.. there isn't a set order in which the jvm will chose the next thread that gets the lock. So the first thread that blocked could be the last thread to get the lock and vice-versa.
+
+> So instead of using synchronisation we can prevent thread interference using classes that implement the **java.util.concurrent.locks.lock** interface 
+
+> **Reentrant Lock and Unlock**
+> Below not the recommended way as we need to unlock the code ourselves once we've locked something.
+``` java
+public class Main {
+    public static final String EOF = "EOF";
+
+    public static void main(String[] args) {
+        List<String> buffer = new ArrayList<String>();
+        ReentrantLock bufferLock = new ReentrantLock();
+        MyProducer producer = new MyProducer(buffer, ThreadColor.ANSI_YELLOW, bufferLock);
+        MyConsumer consumer1 = new MyConsumer(buffer, ThreadColor.ANSI_PURPLE, bufferLock);
+        MyConsumer consumer2 = new MyConsumer(buffer, ThreadColor.ANSI_CYAN, bufferLock);
+
+        new Thread(producer).start();
+        new Thread(consumer1).start();
+        new Thread(consumer2).start();
+    }
+}
+
+class MyProducer implements  Runnable {
+    private List<String> buffer;
+    private String color;
+    private ReentrantLock bufferLock;
+
+    public MyProducer(List<String> buffer, String color, ReentrantLock bufferLock) {
+        this.buffer = buffer;
+        this.color = color;
+        this.bufferLock = bufferLock;
+    }
+
+    public void run() {
+        Random random = new Random();
+        String[] nums = { "1", "2", "3", "4", "5"};
+
+        for(String num: nums) {
+            try {
+                System.out.println(color + "Adding..." + num);
+
+                bufferLock.lock();
+                buffer.add(num);
+                bufferLock.unlock();
+
+                Thread.sleep(random.nextInt(1000));
+            } catch(InterruptedException e) {
+                System.out.println("Producer was interrupted");
+            }
+        }
+
+        System.out.println(color + "Adding EOF and exiting....");
+        bufferLock.lock();
+        buffer.add("EOF");
+        bufferLock.unlock();
+    }
+}
+
+class MyConsumer implements Runnable {
+    private List<String> buffer;
+    private String color;
+    private ReentrantLock bufferLock;
+
+    public MyConsumer(List<String> buffer, String color, ReentrantLock bufferLock) {
+        this.buffer = buffer;
+        this.color = color;
+        this.bufferLock = bufferLock;
+    }
+
+    public void run() {
+        while(true) {
+            bufferLock.lock();
+                if(buffer.isEmpty()) {
+                    bufferLock.unlock();
+                    continue;
+                }
+                if(buffer.get(0).equals(EOF)) {
+                    System.out.println(color + "Exiting");
+                    bufferLock.unlock();
+                    break;
+                } else {
+                    System.out.println(color + "Removed " + buffer.remove(0));
+                }
+            bufferLock.unlock();
+        }
+    }
+}
+```
+
+> Lock the recommended way
+>* use try and finally to guarantee release 
+``` java
+bufferLock.lock();
+try {
+    ... some code
+} finally {
+    bufferLock.unlock();
+}
+```
+``` java
+class MyProducer implements  Runnable {
+    private List<String> buffer;
+    private String color;
+    private ReentrantLock bufferLock;
+
+    public MyProducer(List<String> buffer, String color, ReentrantLock bufferLock) {
+        this.buffer = buffer;
+        this.color = color;
+        this.bufferLock = bufferLock;
+    }
+
+    public void run() {
+        Random random = new Random();
+        String[] nums = { "1", "2", "3", "4", "5"};
+
+        for(String num: nums) {
+            try {
+                System.out.println(color + "Adding..." + num);
+
+                bufferLock.lock();
+                try {
+                    buffer.add(num);
+                } finally {
+                    bufferLock.unlock();
+                }
+                Thread.sleep(random.nextInt(1000));
+            } catch(InterruptedException e) {
+                System.out.println("Producer was interrupted");
+            }
+        }
+
+        System.out.println(color + "Adding EOF and exiting....");
+        bufferLock.lock();
+        try {
+            buffer.add("EOF");
+        } finally {
+            bufferLock.unlock();
+        }
+    }
+}
+
+class MyConsumer implements Runnable {
+    private List<String> buffer;
+    private String color;
+    private ReentrantLock bufferLock;
+
+    public MyConsumer(List<String> buffer, String color, ReentrantLock bufferLock) {
+        this.buffer = buffer;
+        this.color = color;
+        this.bufferLock = bufferLock;
+    }
+
+    public void run() {
+        while(true) {
+            bufferLock.lock();
+            try {
+                if (buffer.isEmpty()) {
+                    continue;
+                }
+                if (buffer.get(0).equals(EOF)) {
+                    System.out.println(color + "Exiting");
+                    break;
+                } else {
+                    System.out.println(color + "Removed " + buffer.remove(0));
+                }
+            } finally {
+                bufferLock.unlock();
+            }
+        }
+    }
+}
+```
+
+> **tryLock()** - thread can check if lock is available
+``` java
+if(bufferLock.tryLock()){
+    try {
+        buffer.add("EOF");
+    } finally {
+        bufferLock.unlock();
+    }
+} else {
+    ... dosomething else
+}
+```
+> tryLock takes a timeout parameter 
+``` java
+
+```
+
+> We might want to see how many threads are waiting for a lock before we try to aquire it.  If there are already a lot of thread waiting, we can run other code instead of blocking and wait for the lock.
+> One drawback of synchronised lock is that they aren't first come first serve, either the lock interface - **BUT** some implementations do.  The re-entract lock constructor accepts a fairness parameter.  When it's set to true the reentrant lock class will try to be fair by giving them the lock two whichever thread has been waiting for it the longest. Again if the thread comes along and finds out that hundred thread are already waiting and it knows the lock is a fair lock it might choose to terminate instead of blocking on the lock when using a re-entrant lock by calling the get queued lenght method now in our application the producer thread spends most of its time sleeping and the critical sections for the consumers are executed very quickly so there wouldn't be any threads waiting for the lock most of the time and get zero but that is how we go about checking using the get queued length method.
+https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/locks/Lock.html
+
+
+
+> **Executive service interface** found in the java.util.concurrent package.
+> We use implementation of this interface to manage thread interference.
+> We still need to write the code but we don't directly manage any threads as such.
+> It uses thread polls - is a managed set of threads, it reduces the overhead of thread creation. Especially in app that use a large number of threads.  A thread pool may also limit the number of threads that are active, running a block at any one particular time.
+
+> **Fixed thread pool**
+>* Create ExecutorService obj
+>* Use executorService.execute(Runnable implementation) method to start thread
+>* Also, we need explicitly to shutdown executorSerice after thread is done
+>* When executorService.shutdown(); -> the executorService will wait for all executorService to close before shutting down
+``` java
+public static void main(String[] args) {
+    List<String> buffer = new ArrayList<String>();
+    ReentrantLock bufferLock = new ReentrantLock();
+    ExecutorService executorService = Executors.newFixedThreadPool(3);
+
+    MyProducer producer = new MyProducer(buffer, ThreadColor.ANSI_YELLOW, bufferLock);
+    MyConsumer consumer1 = new MyConsumer(buffer, ThreadColor.ANSI_PURPLE, bufferLock);
+    MyConsumer consumer2 = new MyConsumer(buffer, ThreadColor.ANSI_CYAN, bufferLock);
+
+    executorService.execute(producer);
+    executorService.execute(consumer1);
+    executorService.execute(consumer2);
+
+    executorService.shutdown();
+}
+```
+
+
+> **ExecutorService - returning a value**
+https://www.baeldung.com/java-runnable-callable
+> Runnable used when not value is returned.  
+> Callable when value is returned
+> Simply put, the Future class represents a future result of an asynchronous computation – a result that will eventually appear in the Future after the processing is complete.
+> submit() submits a Callable or a Runnable task to an ExecutorService and returns a result of type Future.
+> https://www.baeldung.com/java-executor-service-tutorial
+
+``` java
+public static void main(String[] args) {
+    List<String> buffer = new ArrayList<String>();
+    ReentrantLock bufferLock = new ReentrantLock();
+    ExecutorService executorService = Executors.newFixedThreadPool(5);
+
+    MyProducer producer = new MyProducer(buffer, ThreadColor.ANSI_YELLOW, bufferLock);
+    MyConsumer consumer1 = new MyConsumer(buffer, ThreadColor.ANSI_PURPLE, bufferLock);
+    MyConsumer consumer2 = new MyConsumer(buffer, ThreadColor.ANSI_CYAN, bufferLock);
+
+    executorService.execute(producer);
+    executorService.execute(consumer1);
+    executorService.execute(consumer2);
+
+    Future<String> future = executorService.submit(new Callable<String>() {
+        @Override
+        public String call() throws Exception {
+            System.out.println("I'm being printed in the Callable class");
+            return "This is the callable result";
+        }
+    });
+
+    try{
+        System.out.println(future.get());
+    } catch (ExecutionException e) {
+        System.out.println("Something went wrong");
+    } catch (InterruptedException e){
+        System.out.println("Thread running the task was interrupted");
+    }
+
+    executorService.shutdown();
+}
+```
+
+## **Thread safe queues**
+> ArrayBlockingQueue - is FIFO
+>* add() or remove() -> will throw exeception if obj is locked.
+>* put() or take() -> will wait if obj is locked.
+>* peek() -> look at next element.  Depending on timing we can get a null pointer exception.  Isn't the queue thread safe? Thread safe means that we can be confident that our call to one of the class methods will complete before another thread can run a method in the class.  So the producer code only call the put method and the code following the put doesn't depent on the result of the put. However, in the consumer code what we're doing is we check to see if the queue is empty, if it isn't we then peek at the next element but the consumer thread can be suspended between calling is empty and calling peek.  While it is supende, the other consumer thread can run and take the next element from the queue when the suspended consumer thread runs again peek returns null and consequently we get a null pointed exception.  Therefore we still need to add synchronised block on the array queue
+
+``` java
+try {
+    if (buffer.isEmpty()) {
+        continue;
+    }
+    // -> Can be interupted here
+    if (buffer.peek().equals(EOF)) {
+        System.out.println(color + "Exiting");
+        break;
+    } else {
+        System.out.println(color + "Removed " + buffer.take());
+    }
+} catch (InterruptedException e){
+
+}
+```
+> Solution - use synchronised method
+``` java
+synchronized (buffer){
+    try {
+        if (buffer.isEmpty()) {
+            continue;
+        }
+        if (buffer.peek().equals(EOF)) {
+            System.out.println(color + "Exiting");
+            break;
+        } else {
+            System.out.println(color + "Removed " + buffer.take());
+        }
+    } catch (InterruptedException e){
+    }
+}
+```
+
+## **Deadlocks**
+> Deadlock occurs when two or more threads are blocked on locks and every thread that's blocked is holding a lock that another block thread wants
+``` java
+public class Main {
+
+    public static Object lock1 = new Object();
+    public static Object lock2 = new Object();
+
+    public static void main(String[] args) {
+        new Thread1().start();
+        new Thread2().start();
+    }
+
+    private static class Thread1 extends Thread {
+        public void run() {
+            synchronized (lock1) {
+                System.out.println("Thread 1: Has lock1");
+                try {
+                    Thread.sleep(100);
+                } catch(InterruptedException e) {
+
+                }
+                System.out.println("Thread 1: Waiting for lock 2");
+                synchronized (lock2) {
+                    System.out.println("Thread 1: Has lock1 and lock2");
+                }
+                System.out.println("Thread 1: Released lock2");
+            }
+            System.out.println("Thread 1: Released lock1. Exiting...");
+        }
+    }
+
+    private static class Thread2 extends Thread {
+        public void run() {
+            synchronized (lock2) {
+                System.out.println("Thread 2: Has lock2");
+                try {
+                    Thread.sleep(100);
+                } catch(InterruptedException e) {
+
+                }
+                System.out.println("Thread 2: Waiting for lock1");
+                synchronized (lock1) {
+                    System.out.println("Thread 2: Has lock1 and lock2");
+                }
+                System.out.println("Thread 2: released lock1");
+            }
+            System.out.println("Thread 2: Released lock2. Exiting...");
+        }
+    }
+}
+```
+> **Prevention**
+>* Try to lock on a single object... If you can write the code so that only one lock is required, the code won't deadlock - but is not a practical solution
+>* Is to require that all threads must first try to obtain the locks in the same order. (switch above example accordingly - simple)
+>* Use a lock object rather than using synchronised blocks. Use the trylock() method with or without timeout vlaue will prevent deadlocks but that will depend on the code.
+
+> **Another way deadlock can occur**
+> Suppose we have 2 classes that contain synchronise methods, and each class calls a method in the other class. (fyi - difficult to replicate this type of deadlock on purpose but can happen).
+> If one thread (Thread1) calls Data.updateData() while another thread (Thread2) calls Display.updateDisplay(), the following could happen, depending on timing
+>* 1. Thread1 enters data.updateData() and writes to the console, then suspends
+>* 2. Thread2 enters display.updateDisplay() and writes to console, then suspends
+>* 3. Thread1 runs and tries to call display.dataChanged(), but Thread2 is still running display.updateDisplay(), so it's holding the lock on the Display object.  Thread 1 blocks.
+>* 4. Thread2 wakes up and tries to run data.getData(), but Thread1 is still running data.updateData(), so Thread2 blocks.
+``` java 
+private static class Data{
+    private Display display;
+
+    public void setDisplay(Display display){
+        this.display = display;
+    }
+
+    public synchronized void updateData(){
+        System.out.println("Updating data..");
+        display.dataChanged();
+    }
+
+    public synchronized Object getData(){
+        return new Object();
+    }
+}
+
+private static class Display{
+    private Data data;
+
+    public void setData(Data data){
+        this.data = data;
+    }
+
+    public synchronized void dataChanged(){
+        System.out.println("I am doing something because the data changed ...");
+    }
+
+    public synchronized void updateDisplay(){
+        System.out.println("Updating display.. ");
+        Object o = data.getData();
+    }
+}
+```
+
+> Another example
+``` java
+public class Main {
+
+    public static void main(String[] args) {
+        final PolitePerson jane = new PolitePerson("Jane");
+        final PolitePerson john = new PolitePerson("John");
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                jane.sayHello(john);
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                john.sayHello(jane);
+            }
+        }).start();
+    }
+
+    // 1. Thread1 acquires the lock on the jane object and enters the sayHello() method.
+    // It prints to the console, then suspends.
+    // 2. Thread2 acquires the lock on the john object and enters the sayHello() method.
+    // It prints to the console, then suspends.
+    // 3. Thread1 runs again and wants to say hello back to the john object. It tries to call the sayHelloBack() method
+    // using the john object that was passed into the sayHello() method,
+    // but Thread2 is holding the john lock, so Thread1 suspends.
+    // 4. Thread2 runs again and wants to say hello back to the jane object. It tries to call the sayHelloBack() method
+    // using the jane object that was passed into the sayHello() method,
+    // but Thread1 is holding the jane lock, so Thread2 suspends.
+
+    static class PolitePerson {
+        private final String name;
+
+        public PolitePerson(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public synchronized void sayHello(PolitePerson person) {
+            System.out.format("%s: %s" + " has said hello to me!%n", this.name, person.getName());
+            person.sayHelloBack(this);
+        }
+
+        public synchronized void sayHelloBack(PolitePerson person) {
+            System.out.format("%s: %s" + " has said hello back to me!%n", this.name, person.getName());
+        }
+    }
+}
+```
