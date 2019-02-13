@@ -1781,6 +1781,7 @@ public class Theatre {
 ```
 
 
+
 ## **Comparable vs Comparator**
 
 > Comparable - just need to implement it and override the compareTo method
@@ -1888,11 +1889,138 @@ https://docs.oracle.com/javase/tutorial/essential/concurrency/imstrat.html
 >- has no defined ordering number one 
 >- cannot contains dupes
 >- implementation are the hastset and the treeset
-``` java
 
+> Sets - don't take dupes (only first one added), unordered list
+> Hastset need to overwrite equals() and hashCode() method - use the one from the String class... because by default newly created objects are different instances.  There need to let hashset know the primary key being used
+> Potential issues - thoughts required to handle sub classes.. Where the equals() and hashcode() need to be.. Do we need to implement final...
+``` java
+@Override // To guarantee that we are overriding the equals method use the @ notation
+public boolean equals(Object obj) {
+    if(this == obj) {
+        return true;
+    }
+
+    // Check if object have the same class - will exclude extended class
+    System.out.println("obj.getClass() is " + obj.getClass());
+    System.out.println("this.getClass() is " + this.getClass());
+    if ((obj == null) || (obj.getClass() != this.getClass())) {
+        return false;
+    }
+
+    String objName = ((HeavenlyBody) obj).getName();
+    return this.name.equals(objName);
+}
+
+@Override
+public int hashCode() {
+    System.out.println("hashcode called");
+    return this.name.hashCode() + 57;
+}
+```
+
+> Bulk operations on sets
+> They are destructive.. need to create new hashset..
+https://docs.oracle.com/javase/tutorial/collections/interfaces/set.html
+
+> Symmetry vs Asymmetry
+
+``` java
+public class SetMain {
+    public static void main(String[] args) {
+        Set<Integer> squares = new HashSet<>();
+        Set<Integer> cubes = new HashSet<>();
+
+        for (int i = 1; i <= 100; i++) {
+            squares.add(i * i);
+            cubes.add(i * i * i);
+        }
+
+        // Show that dupes are not added
+        System.out.println("There are " + squares.size() + " squares and " + cubes.size() + " cubes.");
+        Set<Integer> union = new HashSet<>(squares);
+        union.addAll(cubes);
+        System.out.println("Union contains " + union.size() + "  elements.");
+
+        // Intersection
+        Set<Integer> intersection = new HashSet<>(squares);
+        intersection.retainAll(cubes);
+        System.out.println("Intersection contains " + intersection.size() + " elements.");
+        for (int i : intersection) {
+            System.out.println(i + " is the square of " + Math.sqrt(i) + " and the cube of " + Math.cbrt(i));
+        }
+
+        // dupes are excluded here "the"
+        Set<String> words = new HashSet<>();
+        String sentence = "one day in the year of the fox";
+        String[] arrayWords = sentence.split(" ");
+        words.addAll(Arrays.asList(arrayWords));
+
+        for (String s : words) {
+            System.out.println(s);
+        }
+
+        // Asymmetric difference
+        // Left/Right join but exclude the intersection
+        Set<String> nature = new HashSet<>();
+        Set<String> divine = new HashSet<>();
+        String[] natureWords = {"all", "nature", "is", "but", "art", "unknown", "to", "thee"};
+        nature.addAll(Arrays.asList(natureWords));
+
+        String[] divineWords = {"to", "err", "is", "human", "to", "forgive", "divine"};
+        divine.addAll(Arrays.asList(divineWords));
+
+
+        System.out.println("nature - divine:");
+        Set<String> diff1 = new HashSet<>(nature);
+        diff1.removeAll(divine);
+        printSet(diff1); // prints -> all but art thee nature unknown
+
+        System.out.println("divine - nature:");
+        Set<String> diff2 = new HashSet<>(divine);
+        diff2.removeAll(nature);
+        printSet(diff2); // prints -> err forgive divine human
+
+
+        // Symmetric difference is (UNION - intersection)
+        Set<String> unionTest = new HashSet<>(nature);
+        unionTest.addAll(divine);
+        Set<String> intersectionTest = new HashSet<>(nature);
+        intersectionTest.retainAll(divine);
+
+        System.out.println("Symmetric difference");
+        unionTest.removeAll(intersectionTest);
+        printSet(unionTest);  // prints -> all but art thee err nature forgive divine human unknown
+
+        if(nature.containsAll(divine)) {
+            System.out.println("divine is a subset of nature"); // Won't print
+        }
+
+        if(nature.containsAll(intersectionTest)) {
+            System.out.println("intersection is  subset of nature");
+        }
+
+        if(divine.containsAll(intersectionTest)) {
+            System.out.println("intersection is a subset of divine");
+        }
+    }
+
+    private static void printSet(Set<String> set) {
+        System.out.print("\t");
+        for(String s : set) {
+            System.out.print(s + " ");
+        }
+        System.out.println();
+    }
+}
 ```
 
 
+## **Linked hashmap and Linked hashset**
+> Maintain insertion order
+> Return read-only version - but remember objects themselves can be modified
+``` java
+Collections.unmodifiableMap(list)
+```
 
 ## **Lambda Expressions**
 > Same like callback in javascript
@@ -2178,7 +2306,31 @@ public class Main {
     }
 }
 ```
+``` java
+printEmployeesByAge(employees, "Employees over 30", employee -> employee.getAge() > 30);
+printEmployeesByAge(employees, "Employees 30 and under", employee -> employee.getAge() <= 30);
+printEmployeesByAge(employees, "Employees 30 and under", new Predicate<Employee>() {
+    @Override
+    public boolean test(Employee employee) {
+        return employee.getAge() < 25;
+    }
+});
 
+IntPredicate greaterThan15 = i -> i > 15;
+IntPredicate lessThan100 = i -> i < 100;
+System.out.println(greaterThan15.test(10));
+int a = 20;
+System.out.println(greaterThan15.test(a+5));
+System.out.println(greaterThan15.and(lessThan100).test(50)); // Chaining lambda predicates
+System.out.println(greaterThan15.and(lessThan100).test(15)); // Chaining lambda predicates
+```
+``` java
+Random random = new Random();
+Supplier<Integer> randomSupplier = () -> random.nextInt(10000);
+for(int i=0; i<10; i++){
+    System.out.println(randomSupplier.get());
+}
+```
 
 ## **Regular Expressions**
 ``` java
