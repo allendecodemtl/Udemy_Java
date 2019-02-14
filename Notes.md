@@ -2332,6 +2332,355 @@ for(int i=0; i<10; i++){
 }
 ```
 
+> **Functions**
+> > Use **.apply()** method to run function
+``` java
+public static void main(String[] args) {
+    Employee john = new Employee("John Doe", 30);
+    Employee tim = new Employee("Tim Buchalka", 21);
+    Employee jack = new Employee("Jack Hill", 40);
+    Employee snow = new Employee("Snow White", 22);
+    Employee red = new Employee("Red RidingHood", 35);
+    Employee charming = new Employee("Prince Charming", 31);
+
+    List<Employee> employees = new ArrayList<>();
+    employees.add(john);
+    employees.add(tim);
+    employees.add(jack);
+    employees.add(snow);
+    employees.add(red);
+    employees.add(charming);
+
+    Function<Employee, String> getLastName = (Employee employee) -> {
+        return employee.getName().substring(employee.getName().indexOf(' ') + 1);
+    };
+
+    String lastName = getLastName.apply(employees.get(1));
+    System.out.println(lastName);
+}
+```
+> Passing function as a parameter
+``` java
+psvm(String[] args) -> {
+    Function<Employee, String> getLastName = (Employee employee) -> {
+        return employee.getName().substring(employee.getName().indexOf(' ') + 1);
+    };
+
+    Function<Employee, String> getFirstName = (Employee employee) -> {
+        return employee.getName().substring(0, employee.getName().indexOf(' '));
+    };
+
+    Random random1 = new Random();
+    for (Employee employee : employees){
+        if(random1.nextBoolean()){
+            System.out.println(getAName(getFirstName, employee));
+        } else {
+            System.out.println(getAName(getLastName, employee));
+        }
+    }
+}
+public static String getAName (Function<Employee, String> getName, Employee employee){
+    return getName.apply(employee);
+}
+```
+
+> **Chaining Functions**
+> First create/define function1, function2 and function3
+> Use **.andThen()** like this function1.andThen(function2).andThen(function3);
+> the processing sequence would be to do 1, 2 and 3;
+``` java
+Function<Employee, String> upperCase = (employee) -> employee.getName().toUpperCase();
+Function<String, String> getUpperFirstName = name -> name.substring(0, name.indexOf(' '));
+Function chainedFunction = upperCase.andThen(getUpperFirstName);
+
+for (Employee employee : employees){
+    System.out.println(chainedFunction.apply(employee));
+}
+```
+```
+JOHN
+TIM
+JACK
+SNOW
+RED
+PRINCE
+```
+> Use **.compose()** method
+> e.g 2.compose(1) -> will process 1 and then 2 
+> It's the reverse of .apply()
+
+
+> **Function interface that takes two arguments**
+> Use **BiFunction** 
+> BiFunction cannot be chained. Because in chained function the result of one function becomes the argument for the next funciton but a BiFunction has two arguements so it can't be the second or subsequent function in the chain.
+> However, if the bi function was the first step then we could do it using BiFunction and then method for the same reason the BiFunction has to be first function in the chain the Bi Interface doesn't have a compose method.
+``` java
+BiFunction<String, Employee, String> concatAge = (String name, Employee employee) -> {
+    return name.concat(" " + employee.getAge());
+};
+
+String upperName = upperCase.apply(employees.get(0));
+System.out.println(concatAge.apply(upperName, employees.get(0)));
+```
+
+
+**Unary operator**
+> This is a more specific type of function that accepts a single argument and returns a value of the same type as the argument.
+> e.g long unary operator accepts a long and returns a long. 
+> All the unary variants extend the function interface so therefore they can be chain together just like functions.
+``` java
+IntUnaryOperator incBy5 = i -> i+5;
+System.out.println(incBy5.applyAsInt(10));
+```
+
+**Consumer Interface**
+> Consumer interface doesn't return a value.  Chaining them only let's you do things but won't output something to be used as arguement for the next consumer function.  Each consumer in the chain is evaluated independently of the others so there's little use to chain them.
+``` java
+Consumer<String> c1 = s -> System.out.println(s.toUpperCase());
+Consumer<String> c2 = s -> System.out.println(s);
+c1.andThen(c2).accept("Hello, World");
+```
+
+**More than two arguements**
+> We can write lambda expressions that takes many arguements as you liked but we can't then use those that take more than two with any of the interfaces in the java.util.function package. 
+> The only time it is maybe a problem is when we want to use an API that perhaps takes one of the interfaces as a parameter so in the case you probably want to massage your code so that you can use a lambda tha matches the required interface.
+
+
+**Summary**
+> The interfaces reperesent structures the lambda expression.
+> When we want to use a lambda expression that tests a value and return true or false, we can use a predicate
+> When, we want to use a lambda expression in place for method that accepts an argument and returns a value, we can use function.
+> The interface don't dictate what the lambdas must do
+> They are not like interfaces such as runnable which we know represents an object with a block of executable code or an event handler which we know contains code that will run when the user interacts with the user interface component.
+> The java.util.function iterfaces describe the arguments and return value but not acutally what the implementations must do.
+
+![Recap](images/img_0004.png)
+
+
+## **Colon (::) Notation**
+> This notation is called a method reference so we can use them when all that a lamdba does is call an existing method.
+> One way to look at it is as follows
+``` java
+String upperString = myString.toUpperCase();
+String upperString = toUpperCase(myString);
+somecollection.stream().map(String::toUpperCase); // -> we are passing the toUpperCase function here
+somecollection.stream().map(s -> s.toUpperCase(););
+```
+https://www.codementor.io/eh3rrera/using-java-8-method-reference-du10866vx
+https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html
+
+
+## **Streams**
+> Stream is a sequence of elements supporting sequential and parallel aggregate operations. It can be used with collection, array or an I/O channel
+> It actually means that is a set of object references.
+> The stream method which was added to the collections class in Java8, creates a stream from a collection.  
+> Now each object reference in the stream corresponds to an object in the collection and the ordering of the object reference matches the orering of the collection.
+> Now when we want to use a stream that uses a collection as source.
+> The stream method will always be the first call we make
+
+``` java
+List<String> someBingoNumbers = Arrays.asList(
+                "N40", "N36",
+                "B12", "B6",
+                "G53", "G49", "G60", "G50", "g64",
+                "I26", "I17", "I29",
+                "O71");
+
+someBingoNumbers
+        .stream()
+        .map(String::toUpperCase)
+        .filter(s->s.startsWith("G"))
+        .sorted()
+        .forEach(System.out::println);
+```
+
+> The stream operations that we use have to meet two requirements:
+>* 1. Non-intefering which means that they don't change the stream source in any way
+>* 2. They must be stateless - the result of an operation can't depend on any state outside of the operation, e.g it can't depend on variable values in a previous step. Each operation should be seen as an independent step that's operating on a stream argument. 
+
+**map()**
+> In Java 8, stream().map() lets you convert an object to something else
+> map() -> the map method accepts a function.  A function accepts one argument and returns a value.  In the above example we're mapping a string dot(.) to an uppercase method to function.  S0 the method itself doesn't accept the parameter but there is a source string and it's the string object were using to invoke the method.
+
+**filter()**
+> filter() - method wants a predicate, not a function, so in this case, we are passing a lambda expression that takes one parameter and returns a true false value.  The resulting stream will then contain only those items for which the predicate return true
+
+**sorted()**
+> sorted() - sorts on the natural ordering 
+> there's also a version of the sorted method that accepts the comparator parameter.
+
+**forEach()**
+> Different from the one with the iterable interface.
+> This one is from the stream class
+> They are similar, it accepts a consumer as a parameter and evalute the consumer for each item in the stream.
+
+## **Stream intermetdiate operation**
+> Operations that return a stream are called intermediate operations because they don't force the end of the chian.
+
+## **Stream terminal operation**
+> A terminal op returns either void or non stream result.
+
+## **Create stream from scratch**
+> We can create stream of any types but cannot mixed object in a stream.
+``` java
+Stream<String> ioNumberStream = Stream.of("I26", "I17", "I29", "O71");
+Stream<String> inNumberStream = Stream.of("N40", "N36", "I26", "I17", "I29", "O71");
+Stream<String> concatStream = Stream.concat(ioNumberStream, inNumberStream);
+System.out.println("-----------------------");
+System.out.println(concatStream
+        .distinct()
+        .peek(System.out::println)
+        .count());
+```
+
+**concat()**
+> Is static, cannot be used in a chain but can be used at the start of a chain.
+
+**count()**
+> Is a terminal op and returns a long.
+
+**distinct()**
+> Use the string.equal() method is this case for comparison
+
+**peek()** -> mainly used for debugging
+> We want to print the stream for debugging - we could use the forEach() but it is a terminal operation.  Instead we could use the peek() method wich accepts a consumer argument.  It evaluates the consumer for each item in the source stream and then adds the item to a new stream which then returns. Since it returns a stream value, it's an intermediate operation, in other words the chain doesn't have to end.
+
+**flatmap()**
+``` java
+departments.stream()
+            .flatMap(department -> department.getEmployees().stream())
+            .forEach(System.out::println);
+```
+> The flatmap() method wants a function that returns a stream. 
+> Now each department in the souce stream becomes the argument to the function.
+> For each department we call the get employees method wich returns a list and then 
+> We call the stream method on that list to return a stream of employees
+> Now the items in this stream were added to the stream that will be returned from the flat map method.
+> In the case of a HR department we have gone from one department object to 3 employee objects
+> The method is called a flat map because it's often used to flatten nested list.
+> Now in thise case there are lsit of employees nested within the department list.  So the flat map method is the one to use when we want to perform operations on the list but the list isn't the source.
+> So an object containing the list as a source in this scenario.
+> We use the method to create a stream of all object in those list 
+
+
+**collect()** - is a terminal op
+> Collects the element in a stream into a different type of result
+> e.g we can add all the items in teh stream to list or set 
+> after all unless the purpose of the chain is to produce a list of items to print we're going to usually want to save the result somewhere.
+> now you might be using streams to selectively reduce and sort a large list because you may want to use a reduce list in subsequent code.
+> so it would use the collect method to create the reduced list.
+
+``` java
+List<String> someBingoNumbers = Arrays.asList(
+                "N40", "N36",
+                "B12", "B6",
+                "G53", "G49", "G60", "G50", "g64",
+                "I26", "I17", "I29",
+                "O71");
+
+List<String> sortedGNumbers = someBingoNumbers
+                .stream()
+                .map(String::toUpperCase)
+                .filter(s -> s.startsWith("G"))
+                .sorted()
+                .collect(Collectors.toList());
+
+for(String s : sortedGNumbers) {
+    System.out.println(s);
+}
+```
+
+> **Two verions of .collect()**
+>* Accepts a Collector which is an interface to the java.util.stream package.  This version of the method maps the collector to the arguments required by the second version of the method which accepts or expects rather three arguments (a supplier, a biconsumer accumulator, a biconsumer combiner)
+``` java
+List<String> sortedGNumbers = someBingoNumbers
+                .stream()
+                .map(String::toUpperCase)
+                .filter(s -> s.startsWith("G"))
+                .sorted()
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+```
+ > 1st argument, is the supplier - it create objects.  Now we want an arrayList so we passed teh arraylist::new, which will construct a new arraylist for us.
+ use ::new when we want to pass the constructor.
+ > 2nd argument, is the accumulator which is the ArrayList::add method, that's how will add the items to the arraylist
+ > 3d argument, the addAll method is the combiner. 
+
+ > The accumulator is used when the runtime needs to add a single item into the list.
+ > The combiner is used when the runtime needs to add a single item into a result.  The combiner is sometimes used to improve the efficiency of the operation if and when to do this is up to the java runtime 
+ > We have many APIs that can map to the supplier, accumulator and combiner.
+ > This allow us to do all sort of things using collect
+ 
+``` java
+Employee john = new Employee("John Doe", 30);
+Employee jane = new Employee("Jane Deer", 25);
+Employee jack = new Employee("Jack Hill", 40);
+Employee snow = new Employee("Snow White", 22);
+Employee snow2 = new Employee("Snow2 White2", 22);
+
+
+Department hr = new Department("Human Resources");
+hr.addEmployee(jane);
+hr.addEmployee(jack);
+hr.addEmployee(snow);
+hr.addEmployee(snow2);
+Department accounting = new Department("Accounting");
+accounting.addEmployee(john);
+
+List<Department> departments = new ArrayList<>();
+departments.add(hr);
+departments.add(accounting);
+
+Map<Integer, List<Employee>> groupedByAge = departments.stream()
+        .flatMap(department -> department.getEmployees().stream())
+        .collect(Collectors.groupingBy(employee -> employee.getAge())); // Allows grouping
+```
+``` 
+22-[Snow White, Snow2 White2]
+40-[Jack Hill]
+25-[Jane Deer]
+30-[John Doe]
+```
+**reduce()** - method that combines all the items in a string into a single result
+> There are 3 verions of this object
+> 1. Simplest one which reduces a stream to one of the elemetns in the stream. E.g if you wanted to use a steram to find the youngest employee in the company
+``` java
+ departments.stream()
+            .flatMap(department -> department.getEmployees().stream())
+            .reduce((e1, e2) -> e1.getAge() < e2.getAge() ? e1 : e2)
+            .ifPresent(System.out::println);
+```
+
+**ifPresent()**
+> reduce method has an optional result.
+> reduce method is a terminal operation
+> the ifPresent() is not part of the stream operation chain as such.
+> here we are just chaining a non stream method called onto the stream chain result
+
+**Other things**
+> Cannot be re-used once terminated, will receive illegal state op if we try to operate on the stream again.
+> Operations in steram are lazily evaluated - meaning that inermediate operations are not performed until there's a terminal operation
+> We can use more specific stream interfaces when we're working with lits of numbers. so IntStream, LongStream and DoubleStream - they have additional methods like sum(), max(), min() and a few others
+``` java
+Stream.of("ABC", "AC", "BAA", "CCCC", "XY", "ST")
+        .filter(s -> {
+            System.out.println(s);  // -> won't be printed. Nothing happens until there's a terminal operations
+            return s.length() == 3;
+        });
+```
+``` java
+Stream.of("ABC", "AC", "BAA", "CCCC", "XY", "ST")
+        .filter(s -> {
+            System.out.println(s); // Now this will print because we have count() at the end.
+            return s.length() == 3;
+        })
+        .count();
+```
+
+
+**Parallel Streams**
+> Used when we want to increase performacne by executing streams in parallel
+
+
 ## **Regular Expressions**
 ``` java
 String alphanumeric = "abcDeeeF12Ghhiiiijkl99z";
@@ -4408,3 +4757,309 @@ public class Main {
     }
 }
 ```
+
+
+
+
+> **Thread Starvation**
+> Happens due to thread priority - thread languish waiting even though lock is frequently release.
+``` java
+public class Main {
+    private static Object lock = new Object(); // Is static - therefore only one copy, all threads will be competing for that exact same copy.
+
+    public static void main(String[] args) {
+        Thread t1 = new Thread(new Worker(ThreadColor.ANSI_RED), "Priority 10");
+        Thread t2 = new Thread(new Worker(ThreadColor.ANSI_BLUE), "Priority 8");
+        Thread t3 = new Thread(new Worker(ThreadColor.ANSI_GREEN), "Priority 6");
+        Thread t4 = new Thread(new Worker(ThreadColor.ANSI_CYAN), "Priority 4");
+        Thread t5 = new Thread(new Worker(ThreadColor.ANSI_PURPLE), "Priority 2");
+        // Just suggestions - ultimately os will decide
+        t1.setPriority(10);  // Highest
+        t2.setPriority(8);
+        t3.setPriority(6);
+        t4.setPriority(4);
+        t5.setPriority(2);   // Lowest
+
+        t3.start();
+        t2.start();
+        t5.start();
+        t4.start();
+        t1.start();
+
+    }
+
+    private static class Worker implements Runnable {
+        private int runCount = 1;
+        private String threadColor;
+
+        public Worker(String threadColor) {
+            this.threadColor = threadColor;
+        }
+
+        @Override
+        public void run() {
+            for(int i=0; i<100; i++) {
+                synchronized (lock) {
+                    System.out.format(threadColor + "%s: runCount = %d\n", Thread.currentThread().getName(), runCount++);
+                    // execute critial section of code
+                }
+            }
+        }
+    }
+}
+```
+
+> **Fair locks**
+> Fair lock try to be first come first serve
+> Fairness to acquire the lock only not thread scheduling
+> Affect performance
+``` java
+private static ReentrantLock lock = new ReentrantLock(true);
+
+public static void main(String[] args) {
+    Thread t1 = new Thread(new Worker(ThreadColor.ANSI_RED), "Priority 10");
+    Thread t2 = new Thread(new Worker(ThreadColor.ANSI_BLUE), "Priority 8");
+    Thread t3 = new Thread(new Worker(ThreadColor.ANSI_GREEN), "Priority 6");
+    Thread t4 = new Thread(new Worker(ThreadColor.ANSI_CYAN), "Priority 4");
+    Thread t5 = new Thread(new Worker(ThreadColor.ANSI_PURPLE), "Priority 2");
+
+    t1.setPriority(10);
+    t2.setPriority(8);
+    t3.setPriority(6);
+    t4.setPriority(4);
+    t5.setPriority(2);
+
+    t3.start();
+    t2.start();
+    t5.start();
+    t4.start();
+    t1.start();
+
+}
+
+private static class Worker implements Runnable {
+    private int runCount = 1;
+    private String threadColor;
+
+    public Worker(String threadColor) {
+        this.threadColor = threadColor;
+    }
+
+    @Override
+    public void run() {
+        for(int i=0; i<100; i++) {
+            lock.lock();
+            try {
+                System.out.format(threadColor + "%s: runCount = %d\n", Thread.currentThread().getName(), runCount++);
+                // execute critial section of code
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+}
+```
+
+> **Live locks**
+> Similar to deadlocks but instead of the threads been blocked they're actually constantly active and usually waiting for all the other threads to complete their tasks.  Now, since all the threads are waiting for others to compete, none of them can actually progress.  
+> e.g Thread A will loop until Thread B complete its task and Thread B will loop until Thread A complete its task. Both Thread A and B can both be looping and waiting for the other to complete.
+> That's actually what's called a live lock the threads will never progress but they are not actuall blocked.
+
+> Solution will depend on the code
+
+``` java
+public class Main {
+    public static void main(String[] args) {
+        final Worker worker1 = new Worker("Worker 1", true);
+        final Worker worker2 = new Worker("Worker 2", true);
+
+        final SharedResource sharedResource = new SharedResource(worker1);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                worker1.work(sharedResource, worker2);
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                worker2.work(sharedResource, worker1);
+            }
+        }).start();
+    }
+}
+
+class SharedResource {
+
+    private Worker owner;
+
+    public SharedResource(Worker owner) {
+        this.owner = owner;
+    }
+
+    public Worker getOwner() {
+        return owner;
+    }
+
+    public synchronized void setOwner(Worker owner) {
+        this.owner = owner;
+    }
+}
+
+class Worker {
+
+    private String name;
+    private boolean active;
+
+    public Worker(String name, boolean active) {
+        this.name = name;
+        this.active = active;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public synchronized void work(SharedResource sharedResource, Worker otherWorker) {
+
+        while(active) {
+            if(sharedResource.getOwner() != this) {
+                try {
+                    wait(10);
+                } catch(InterruptedException e) {
+
+                }
+                continue;
+            }
+
+            if(otherWorker.isActive()) {
+                System.out.println(getName() + " : give the resource to the worker " + otherWorker.getName());
+                sharedResource.setOwner(otherWorker);
+                continue;
+            }
+
+            System.out.println(getName() + ": working on the common resource");
+            active = false;
+            sharedResource.setOwner(otherWorker);
+        }
+    }
+}
+```
+
+
+> **Slipped condition**
+> This is a specific type of race condition (aka thread interference)
+> It can occur when a thread can be suspended between reading a condition and acting on it.
+> E.g we have two threads reading from a buffer.  Each thread does the following:
+> 1. Check the statis
+> 2. If it's ok, reads data from the buffer
+> 3. If the data is EOF, it sets the status to EOF and terminates.  If the data isn't EOF it sets the status to OK.
+> If we haven't synchronised the code properly, the following can happen:
+> 1. Thread1 checks the status and gets OK. It suspends.
+> 2. Thread2 checks the status and gets OK. It reads EOF from the buffer and sets the status to EOF, then terminates
+> 3. Thread1 runs again. It tries to read data from the buffer, but oops, there's no data. It throws an exception or crashes.
+> Because the threads can interfere with each other when checking and setting the condition, Thread1 tried to do something based on obsolete information.  When it checked the status, it was ok.
+> But by the time it acted on the condition it checked, the status had been updated by Thread2,  Unfortunately, Thread1 doesn't see the updated information, and because of that, it does something erroneous.
+> **Solution** - use synchronised blocks or locks to synchronise the critical section of code.
+> If the code is already synchronised, then sometimes the placement of the synchronisation may be causing the problem.
+> When using multiple locks, the order in which the locks can be acquired can also result in a slipped condition.
+
+
+
+> **Thread Issues**
+> When a tread is running, it can be suspended when it's in the middle of doing something. 
+> E.g if a thread calls the System.out.println() method, it can be suspended in the middle of executing the method.  It may be have evaluated the argument that's being passed, but it's suspended before it can print the result. Or it may be partway through evaluating the argument when it's suspended.  Essentially, System.out.println() isn't an atomic action.
+> An **atomic** action can't be suspended in the middle of being executed.  It either completes, or it doesn't at all.  Once a thread starts to run an atomic action, we can be confident that it won't be suspended until it has completed the action.
+> In java the following ops are atomic:
+>* 1. Reading and writing reference variables.  Eg the statement myObj1 = myObj2 would be atomic.  A thread can't be suspended in the middle of executing this statement.
+>* 2. Reading and writing primitive variables, except those of the type long and double.  The JVM may be require two operations to read and write longs and doubles, and a thread can be suspended between each operation.  E.g a thread can't be suspended in the middle of executing myInt=0.  But it can be suspended in the middle of executing myDouble=1.234
+>* 3. Reading and writing all variables declared volatile
+
+> **Volatile** variables.
+> We still need to deal with thread interference with atomic actions.  That's because of the way Java manages memory, it's possible to get memory consistency errors when multiple threads can read and write the same variable.
+> Each thread has a CPU cache, which can contain copies of values that are in main memory.
+> Since it's faster to read from the cache, this can improve the performance of an application.  There wouldn't be a problem if there was only one CPU, but these days, most computers have more than one CPU.
+> When running an application, each thread may be running on a different CPU and each CPU has its own cache.  It's possible for the values in the caches to become out of sync with each other, and with the value in main memory - a memory consistency error.
+
+> Suppose we have 2 threads that use the same int counter.  Thread1 reads and writes the counter.  Thread2 only reads the counter.  As we know, reading and writing to an it is an atomic action. A thread won't be suspended in the middle of reading or writing the value to memory.  But let's suppose that Thread1 is running on CPU1, and Thread2 is running on CPU2.  Because of CPU caching, the following can happen:
+>* 1. The value of teh counter is 0 in main memory
+>* 2. Thread1 reads athe value of 0 from main memory
+>* 3. Thread1 adds1 to the value
+>* 4. Thread1 writes the vlaue of 1 to its CPU cachec
+>* 5. Thread2 reads the value of counter from main memory and gets 0, rather than the latest value, which is 1.
+
+> This is where volatile variables come in.  when we use a non-volatile variable the JVM doesn't guarantee when it writes an updated vlaue back to main memory.  But when we use a volatile variable, the JVM writes teh value back to main memory immediately after a thread updates the value in its CPU cache.  It also guarantees that every time a variable reads from a volatile varaible, it will get the latest value.
+``` java
+public volatile int counter;
+```
+
+> Unfortunately, we still need to synchronise volatile variables.  This is required when more than one thread can update the value of a volatile variable otherwise we get a race condition.
+> E.g we have 2 threads that share a volatile int counter, and each thread can run "counter++".  This isn't an atomic operation.  A thread has to do the following: 
+>* 1. Read the value of counter from memory
+>* 2. Add 1 to counter
+>* 3. Write the new value of counter back to memory
+
+> A thread can be suspended after any of these steps. Because of that, the following can happen:
+>* 1. The value of the counter is 1 in main memory and in Threa1 and Thread2 CPU caches
+>* 2. Thead1 reads the value of counter and gets 1
+>* 3. Thead2 reads the value of counter and gets 1
+>* 4. Thread1 increments the value and gets 2.  It writes 2 to its cache.  The JVM immediately writes 2 to main memory
+>* 5. Thread2 increments the value and gets 2.  It writes 2 to its cache.  The JVM immediately writes 2 to main memory
+>* 6. Oops! The counter has been incremented twice, so its value should now be 3
+
+> A memory consistency error like this can occur when a thread can update the value of the variable in a way that depends on the existing value of variable.  In the counter++ case, the result of the increment depends on the existing value of the variable.
+
+> In other words, a thread has to read the value of the counter variable in order to generate a new value for counter.  By the time the thread operates on the value it has read, the value could be stale.
+
+> Whether to synchronsie when using a volatile variable will depend on the code and what the threads will be doing.  A common use of volatile is with variables of type long and double.  Reading and writing longs and doubles isn't atomic.
+
+> Using volatile makes them atomic, but we'd still have to use synchronisation in the situation whe just described - when a thread reads the value of a variable and then uses the value, which may be stale, to generate a new value for the variable.
+ 
+ > Java provdes classes that allows us to read and write variables without having to worry about thread interference or memory consistency errors.
+ > The **java.util.concurrent.atomic** package provides us with classes that we can use to ensure that reading and writing variables is atomic.
+
+ > E.g using AtomicInteger object. The java doc states that classes in the **java.util.concurrent.atomic**  package "support lock-free thread-safe programming on single varaibles."
+ https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/package-summary.html
+
+``` java
+class Counter{
+    //private int counter = 0;
+    private AtomicInteger counter = new AtomicInteger(0);
+
+    public void inc(){
+        // counter++;
+        counter.incrementAndGet();
+    }
+
+    public void dec(){
+        // counter--;
+        counter.decrementAndGet();
+    }
+
+    public int getCounter() {
+        // return counter;
+        return counter.get();
+    }
+}
+```
+
+> We can't use AtomicIneger as a substitute for an Integer object.  AtomicIntegers are meant to be used in specific situations like the one above: when thread interference can take place because a thread is changing the value of the variable in way that depends on the existing value.
+> If you take a look at the documentation for the AtomicInteger class, you'll see that a limited number of methods, and most allow us to operate on the existing value of the Atomic variables.
+
+> There are Atomic classes for the following types: boolean, integer, interger array, long, long array, object reference, and double.  
+> Reading and writing long and double isn't atomic - we could use AtomicLong and AtomicDouble classes to make these operations atomic.
+
+> The Atomic classes have set() and get() methods that allow us to set a value, and get the current value.  But the Atomic classes are really meant to be used in situations when a value is being incremented or decremented.  They're intended to be used when the code is using a loop counter, or generating a sequence of numbers for some other reason.
+
+> compareAndSet() method - takes two param: the expected value, and the new value that you want to set.  If the current value doesn't equal the expected value, the method returns false and the set doesn't take place.
+
+> If the current value equals the expected value, then the set goes ahead and the method returns true.  We can see how this would be useful when a thread knows that it might be suspended between getting a value and updating it.
+
+
+
