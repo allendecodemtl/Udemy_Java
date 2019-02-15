@@ -5094,3 +5094,71 @@ class Counter{
 
 ## **Java 9 Module System**
 > 
+
+
+
+
+## **Java is Pass by Value and Not Pass by Reference**
+> Just remember that variables are references or pointers and it’s copy is passed to the methods, so java is always pass by value.
+``` java
+public class Main {
+
+    public static void main(String[] args) {
+
+        Balloon red = new Balloon("Red"); //memory reference 50
+        Balloon blue = new Balloon("Blue"); //memory reference 100
+
+        swap(red, blue);
+        System.out.println("red color="+red.getColor());
+        System.out.println("blue color="+blue.getColor());
+
+        foo(blue);
+        System.out.println("blue color="+blue.getColor());
+
+    }
+
+    // The first line is the important one, when we call a method the method is called on the Object at the reference location.
+    // At this point, balloon is pointing to 100 and hence it’s color is changed to Red.
+    // In the next line, ballon reference is changed to 200
+    // and any further methods executed are happening on the object at memory location 200
+    // and not having any effect on the object at memory location 100.
+    // This explains the third line of our program output printing blue color=Red.
+    private static void foo(Balloon balloon) { //baloon=100
+        balloon.setColor("Red"); //baloon=100
+        balloon = new Balloon("Green"); //baloon=200
+        balloon.setColor("Blue"); //baloon = 200
+    }
+
+    // Notice that we are changing values of o1 and o2 but they are copies of “red” and “blue” reference locations,
+    // so actually there is no change in the values of “red” and “blue” and hence the output.
+    // Since the variables are just the reference to the objects,
+    // we get confused that we are passing the reference so java is pass by reference.
+    // However we are passing a copy of the reference and hence it’s pass by value
+    public static void swap(Object o1, Object o2){ //o1=50, o2=100
+        Object temp = o1; //temp=50, o1=50, o2=100
+        o1=o2; //temp=50, o1=100, o2=100
+        o2=temp; //temp=50, o1=100, o2=50
+    } //method terminated
+}
+
+class Balloon {
+    private String color;
+
+    public Balloon(){}
+
+    public Balloon(String c){
+        this.color=c;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+}
+```
+
+## **Java Heap Space vs Stack – Memory Allocation in Java**
+https://www.journaldev.com/4098/java-heap-space-vs-stack-memory
