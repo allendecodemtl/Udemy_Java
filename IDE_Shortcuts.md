@@ -26,3 +26,5 @@ find . -name '*.zip' -exec sh -c 'rm "$1"' _ {} \;
 ```
 
 
+## **Untrack files already added to git repository based on .gitignore**
+http://www.codeblocq.com/2016/01/Untrack-files-already-added-to-git-repository-based-on-gitignore/
