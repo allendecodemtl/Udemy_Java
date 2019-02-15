@@ -5090,13 +5090,18 @@ class Counter{
 
 > If the current value equals the expected value, then the set goes ahead and the method returns true.  We can see how this would be useful when a thread knows that it might be suspended between getting a value and updating it.
 
-
+___
 
 ## **Java 9 Module System**
 > 
 
 
 
+
+
+
+
+___
 
 ## **Java is Pass by Value and Not Pass by Reference**
 > Just remember that variables are references or pointers and it’s copy is passed to the methods, so java is always pass by value.
@@ -5162,3 +5167,14 @@ class Balloon {
 
 ## **Java Heap Space vs Stack – Memory Allocation in Java**
 https://www.journaldev.com/4098/java-heap-space-vs-stack-memory
+
+
+## **initialization order**
+> The order of initialization is:
+>* 1. Static initialization blocks
+>* 2. Instance initialization blocks
+>* 3. Constructors
+
+## **default values**
+![Recap](images/img_0005.png)
+> Local variables are slightly different; the compiler never assigns a default value to an uninitialized local variable. If you cannot initialize your local variable where it is declared, make sure to assign it a value before you attempt to use it. Accessing an uninitialized local variable will result in a compile-time error.
