@@ -5093,12 +5093,50 @@ class Counter{
 ___
 
 ## **Java 9 Module System**
+> J9 introduced a new program component known as module.  You can think of a java app as a collection of modules
+> The module system was designed to have a reliable configuration, strong encapsulation and a modular JDK/JRE.  
+> The purppose is to solve the problems typicall involved with developing and deploying java app before java 9
+> These modularity feature in J9 are collectively known as the Java Platform Module system or JPMS
+
+> A module is a named collection of data and code
+> Modules contain Java code that is organised as a set of packages.  Each package can contain classes, interfaces and so on
+> You can think of a module as a container of packages.
+
+> Every module needs to have some configuration
+>* name -> unique name of the module
+>* inputs -> what the module needs to use and what is required for the module to be compiled and run
+>* outputs -> what the module outputs or exports to other modules
+
+> This wat you don't have to specify every package that your module needs, only the name of module you depent on
+
+> Every module comes with a module descriptor file that describes the module and contains metadata about the module
+> The module descriptor file is always located directly at teh module root folder, and always has the name **module-info.java**
+
+![Recap](images/img_0006.png)
+
+``` java 
+module packagename {
+
+}
+```
+
+![Recap](images/img_0007.png)
+
+> There are two kinds of modules
+>* 1. normal modules - without the open modifier, grants access at compile time and run time to types in only those packages which are explicitly exported
+>* 2. open modules - with the open modifier, grants acess at compile time to types in only those packages which are explicitly exported, but grants access at run time to types in all its packages, as if all packages had been exported.
+
+
+![Recap](images/img_0008.png)
+![Recap](images/img_0009.png)
+
+
+
+
+___
+
+## **Java Networking Programming**
 > 
-
-
-
-
-
 
 
 ___
