@@ -1,6 +1,8 @@
 .idea/
 .DS_Store
 *.iml
+*.kotlin_module
+Source_Code/
 
 ### Java template
 # Compiled class file
