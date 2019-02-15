@@ -40,5 +40,9 @@ git add .
 ``` bash
 git commit -m ".gitignore fix"
 ```
-
 http://www.codeblocq.com/2016/01/Untrack-files-already-added-to-git-repository-based-on-gitignore/
+
+### **How to manage multiple GitHub accounts on a single machine with SSH keys**
+https://medium.freecodecamp.org/manage-multiple-github-accounts-the-ssh-way-2dadc30ccaca
+https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
+
