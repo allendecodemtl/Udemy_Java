@@ -1783,16 +1783,26 @@ public class Theatre {
 
 
 ## **Comparable vs Comparator**
+> The Comparable interface is a good choice when used for defining the default ordering or, in other words, if it’s the main way of comparing objects.
 
-> Comparable - just need to implement it and override the compareTo method
+> Then, we must ask ourselves why use a Comparator if we already have Comparable?
+
+> There are several reasons why:
+>* Sometimes, we can’t modify the source code of the class whose objects we want to sort, thus making the use of Comparable impossible
+>* Using Comparators allows us to avoid adding additional code to our domain classes
+>* We can define multiple different comparison strategies which isn’t possible when using Comparable
+
+> **Comparable** - just need to implement it and override the compareTo method
 ``` java
-@Override
-public int compareTo(Seat seat) {
-    return this.seatNumber.compareToIgnoreCase(seat.getSeatNumber());
+public class xxx implements Comparable<xxx>  {
+    @Override
+    public int compareTo(Seat seat) {
+        return this.seatNumber.compareToIgnoreCase(seat.getSeatNumber());
+    }
 }
 ```
 
-> Comparator
+> **Comparator** using anonymous class
 ``` java
 // Anonymous inner class - Implementing interface
 static final Comparator<Seat> PRICE_ORDER = new Comparator<Seat>() {
@@ -1813,8 +1823,27 @@ priceSeat.add(theatre.new Seat("B00", 13.00));
 priceSeat.add(theatre.new Seat("A00", 13.00));
 Collections.sort(priceSeat, Theatre.PRICE_ORDER);
 printList(priceSeat);
-
 ```
+
+> **Comparator** using lambda
+``` java
+// Comparator.comparing static function accepts a sort key Function and returns a Comparator for the type which contains the sort key;
+static <T,U extends Comparable<? super U>> Comparator<T> comparing(Function<? super T,? extends U> keyExtractor)
+
+// Initialising comparator
+Comparator<Player> byRanking = Comparator.comparing(Player::getRanking);
+Comparator<Player> byAge = Comparator.comparing(Player::getAge);
+
+// Using it
+Array.sort(playerList, byRanking);
+Array.sort(playerList, byAge);
+
+// -> Specific comparison
+Comparator<Player> byRanking = (Player player1, Player player2) -> player1.getRanking() - player2.getRanking();
+```
+https://www.baeldung.com/java-8-comparator-comparing
+
+
 
 ## **Map**
 Set - add dupes - does nothing
