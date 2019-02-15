@@ -27,4 +27,18 @@ find . -name '*.zip' -exec sh -c 'rm "$1"' _ {} \;
 
 
 ## **Untrack files already added to git repository based on .gitignore**
+> 1. Commit all you changes
+> 2. Remove everything from the repository
+``` bash
+git rm -r --cached .
+```
+> 3. Re add everything
+``` bash
+git add .
+```
+> 4. Commit
+``` bash
+git commit -m ".gitignore fix"
+```
+
 http://www.codeblocq.com/2016/01/Untrack-files-already-added-to-git-repository-based-on-gitignore/
