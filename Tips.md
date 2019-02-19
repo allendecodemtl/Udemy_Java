@@ -48,4 +48,20 @@ https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-s
 find . -name '*.zip' -exec sh -c 'unzip -d "${1%.*}" "$1"' _ {} \;
 find . -name '*.zip' -exec sh -c 'rm "$1"' _ {} \;
 ```
+## Tomcat
+https://wolfpaulus.com/mac/tomcat/
 
+
+## Setup intellij with correct jdk
+``` xml
+<properties>
+  <maven.compiler.source>1.7</maven.compiler.source>
+  <maven.compiler.target>1.7</maven.compiler.target>
+</properties>
+```
+``` text
+There are 3 places that need to be updated. (1) File -> Settings (Ctrl+alt+s for the shortcut) then "Build, Execution, Deployment">Compiler>Java Compiler and change the "Target bytecode version" to your desired Java version. (2 and 3) The other place is under File>Project Structure (Ctrl+Alt+Shift+S)> "Project Settings">"Project" change Project SDK to point to the appropriate version of Java and set the Project language level to the correct version. The code assist only changes the language level for you unfortunately making this an annoyance for new projects.
+```
+> Also need to rebuild project after updates
+
+https://stackoverflow.com/questions/21006136/intellij-idea-13-uses-java-1-5-despite-setting-to-1-7
