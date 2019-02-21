@@ -3,7 +3,7 @@
 |---|---|---|---|---|
 |Mac|cmd + alt + B|  Jump from interface to implementing class in Java |   |   |
 | Mac | cmd + ctrl + g  | Select all occurrences  |   |   |
-|   |   |   |   |   |
+| Mac  | cmd + alt + t  | Surround code fragments  |   |   |
 
 
  ## **VSC**
