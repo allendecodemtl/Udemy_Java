@@ -13,6 +13,8 @@
 | Mac  | shift + alt + down  | Duplicate lines down  |   |   |
 | Mac  | alt + down  | Move lines down  |   |   |
 
+## **Mac Hidden Files**
+cmd + shift + .
 
  ## **Intellij config for test**
 Hit al-enter on class and chose "Create Test" to generate test file
