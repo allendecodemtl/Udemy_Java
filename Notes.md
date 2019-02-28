@@ -263,6 +263,32 @@ switch (month) {
 }
 ```
 
+## **Recursion - factorial function**
+``` java
+psvm() {
+    System.out.println("4!" + fact(4));
+}
+
+public static int fact(int n) {
+    int result;
+
+    if (n == 0 || n == 1) {
+        System.out.println("n=" + n);
+        return 1;
+    }
+
+    result = fact(n - 1) * n;
+    System.out.println("n-1=" + (n-1) + ", n=" + n + ", result=" + result);
+    return result;
+}
+```
+```
+n=1
+n-1=1, n=2, result=2
+n-1=2, n=3, result=6
+n-1=3, n=4, result=24
+4!24
+```
 
 ## **Minutes to Years and Days Function**
 ``` java
