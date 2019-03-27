@@ -72,7 +72,7 @@ public class Main {
 >- Instance vars represent the state of an instance
 ``` java
 class Dog{
-    private static String name;
+    private String name;
     public Dog(String name) { this.name = name; } // Instanciate instance var
     public void printName() { System.out.println("name = " + name); }
 }
@@ -218,10 +218,10 @@ ___
 > If inherits from a class, JVM will determine which method to use.. Usually the local method but if not available, it will go to the parent.
 ``` java
 public class Movie { .. plot = (): void -> print "No Plot" ..}
-public class Jaws extends Movie{} { .. plot = (): void -> print "Jaws" ..}
-public class MazeRunner extends Movie{} { .. plot = (): void -> print "MazeRunner" ..}
-public class StarWars extends Movie{} { .. plot = (): void -> print "StarWars" ..}
-public class Forgetable extends Movie{} { .. No plot method present ..}
+public class Jaws extends Movie { .. plot = (): void -> print "Jaws" ..}
+public class MazeRunner extends Movie { .. plot = (): void -> print "MazeRunner" ..}
+public class StarWars extends Movie { .. plot = (): void -> print "StarWars" ..}
+public class Forgetable extends Movie { .. No plot method present ..}
 public class Main { 
     psvm = (String[] agrs) -> {
         Movie movie = randomMovie();
@@ -837,14 +837,14 @@ public interface Moveable{ // TODO -> think is changes it to an abstract class
     public abstract void move();  // automatically adds public abstract
 }
 ```
-> Methods inside interface must not be static, final, native or stictfp
-> All variables declared inside interface are implicitly public static final variables(constants)
-> All methods declared inside Java Interfaces are implicitly public and abstract, even if you don't use public or abstract keyword
-> Interface can extend one or more other interface
-> Interface cannot implement a class (including interfaces which are abstract classesby nature)
-> Interface can be nested inside another interface
-> Method signature does note require 'public/private/protected ..'
-> Implementor need to implement/override all methods in interface 
+>- Methods inside interface must not be static, final, native or stictfp
+>- All variables declared inside interface are implicitly public static final variables(constants)
+>- All methods declared inside Java Interfaces are implicitly public and abstract, even if you don't use public or abstract keyword
+>- Interface can extend one or more other interface
+>- Interface cannot implement a class (including interfaces which are abstract classesby nature)
+>- Interface can be nested inside another interface
+>- Method signature does note require 'public/private/protected ..'
+>- Implementor need to implement/override all methods in interface 
 
 ![Recap](images/img_0002.png)
 
@@ -869,7 +869,7 @@ psvm = () => {
 ``` java
 interface ITelephone {
     List<String> returnContacts();
-    void printContracts(List<String> listContacts);  // -> do not have {} - which means implementation
+    void printContracts();  // -> do not have {} - which means implementation
 }
 class DeskPhone implements ITelephone {
     public List<String> returnContacts(){
@@ -891,9 +891,9 @@ class MobilePhone implements ITelephone {
 }
 public class Main {
     psvm = () => {
-        DeskPhone timsPhone = new DeskPhone(123456);
-        MobilePhone tedsPhone = new MobilePhone(99999);  
-        ITelephone interPhone = new MobilePhone(99999);  
+        DeskPhone timsPhone = new DeskPhone("123456");
+        MobilePhone tedsPhone = new MobilePhone("99999");  
+        ITelephone interPhone = new MobilePhone("99999");  
 
         loadObject(timsPhone); // -> going to work because of generic interface as parameter
         loadObject(tedsPhone); // -> going to work because of generic interface as parameter
