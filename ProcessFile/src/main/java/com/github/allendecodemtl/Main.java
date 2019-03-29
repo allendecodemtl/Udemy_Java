@@ -2,17 +2,19 @@ package com.github.allendecodemtl;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class Main {
 
-    public static final String fileName = "/Users/mopom/Desktop/syllabus.txt";
+    public static final String fileName = Paths.get("./src/main/resources/syllabus.txt").toString();
 
     public static void main(String[] args) {
-        processDetails();
+        processSyllabus();
 
     }
 

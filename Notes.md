@@ -3352,6 +3352,7 @@ try (BufferedReader dirFile = new BufferedReader(new FileReader("directions_big.
 
 > Checked vs unchecked exception
 >- Cannot ignore checked exception
+
 ## **Java IO**
 > 
 ``` java
