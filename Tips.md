@@ -67,3 +67,14 @@ There are 3 places that need to be updated. (1) File -> Settings (Ctrl+alt+s for
 > Also need to rebuild project after updates
 
 https://stackoverflow.com/questions/21006136/intellij-idea-13-uses-java-1-5-despite-setting-to-1-7
+
+
+## Git submodule
+https://gist.github.com/gitaarik/8735255
+
+To update 
+``` bash
+git config --global alias.update '!git pull && git submodule update --init --recursive'
+
+git update
+```
