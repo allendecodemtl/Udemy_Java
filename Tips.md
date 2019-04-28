@@ -72,6 +72,11 @@ https://stackoverflow.com/questions/21006136/intellij-idea-13-uses-java-1-5-desp
 ## Git submodule
 https://gist.github.com/gitaarik/8735255
 
+To add
+```
+git submodule add git@github.com:url_to/awesome_submodule.git path_to_awesome_submodule
+```
+
 To update 
 ``` bash
 git config --global alias.update '!git pull && git submodule update --init --recursive'
