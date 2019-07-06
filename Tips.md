@@ -74,7 +74,7 @@ https://gist.github.com/gitaarik/8735255
 
 To add
 ```
-git submodule add git@github.com:url_to/awesome_submodule.git path_to_awesome_submodule
+git submodule add git@github.com:url_to/awesome_submodule.git path_to_awesome_submodule (optional if already in desired directory)
 ```
 
 To update 
